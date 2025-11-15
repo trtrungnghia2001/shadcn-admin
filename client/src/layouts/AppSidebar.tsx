@@ -1,0 +1,115 @@
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+
+import { sidebarLinks } from "@/constants/links";
+import clsx from "clsx";
+import { VenusAndMars } from "lucide-react";
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
+
+export function AppSidebar() {
+  return (
+    <Sidebar className="p-2">
+      <SidebarHeader className="bg-background">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <div className="flex items-center gap-2 rounded-md">
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground size-8 rounded-md flex items-center justify-center">
+                  <VenusAndMars size={16} />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-sm">Shadcn Admin</p>
+                  <p className="text-xs">Vite + ShadcnUI</p>
+                </div>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent className="bg-background">
+        {sidebarLinks.map(({ items, label }, idx) => (
+          <SidebarGroup key={idx}>
+            <SidebarGroupLabel>{label}</SidebarGroupLabel>
+
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {items.map((item) => (
+                  <SidebarMenuItem key={item.label}>
+                    <SidebarMenuButton asChild>
+                      <AppSidebarItem {...item} />
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
+    </Sidebar>
+  );
+}
+
+type SidebarItemProps = {
+  icon?: React.ComponentType<{ size?: number }>;
+  label: string;
+  path?: string;
+  items?: SidebarItemProps[];
+};
+
+const AppSidebarItem = ({
+  icon: Icon,
+  items,
+  label,
+  path,
+}: SidebarItemProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // ---- path → NavLink ----
+  if (path) {
+    return (
+      <NavLink
+        to={path}
+        className={({ isActive }) =>
+          clsx([
+            `flex items-center gap-2 p-2 rounded-md hover:bg-sidebar-accent`,
+            isActive && `bg-sidebar-accent font-semibold`,
+          ])
+        }
+      >
+        {Icon && <Icon size={18} />}
+        <span>{label}</span>
+      </NavLink>
+    );
+  }
+
+  // ---- items → Collapsible ----
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger className="flex items-center gap-2 w-full cursor-pointer p-2 rounded-md hover:bg-sidebar-accent">
+        {Icon && <Icon size={16} />}
+        <span>{label}</span>
+      </CollapsibleTrigger>
+
+      <CollapsibleContent className="ml-4 mt-2 flex flex-col gap-1">
+        {items?.map((child) => (
+          <AppSidebarItem {...child} key={child.label} />
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+};
