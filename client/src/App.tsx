@@ -1,14 +1,14 @@
-import { useRoutes } from "react-router-dom";
-import Dashboard from "./pages/dashboard";
+import Layout from "./components/layouts/Layout";
+import RouterTree from "./routers";
 
 const App = () => {
-  const routers = useRoutes([
-    {
-      index: true,
-      element: <Dashboard />,
-    },
-  ]);
-  return routers;
+  return (
+    <div>
+      <Layout>
+        <RouterTree />
+      </Layout>
+    </div>
+  );
 };
 
 export default App;

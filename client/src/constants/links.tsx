@@ -1,5 +1,3 @@
-import TabsAnalytics from "@/pages/dashboard/TabsAnalytics";
-import TabsOverview from "@/pages/dashboard/TabsOverview";
 import {
   LayoutDashboard,
   Users,
@@ -35,24 +33,5 @@ export const sidebarLinks = [
       },
       { icon: HelpCircle, path: "/help-center", label: "Help Center" },
     ],
-  },
-];
-
-export const dashboardTabs = [
-  {
-    label: `Overview`,
-    element: <TabsOverview />,
-  },
-  {
-    label: `Analytics`,
-    element: <TabsAnalytics />,
-  },
-  {
-    label: `Reports`,
-    element: <TabsOverview />,
-  },
-  {
-    label: `Notifications`,
-    element: <TabsOverview />,
   },
 ];

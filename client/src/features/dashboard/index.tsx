@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { dashboardTabs } from "@/constants/links";
+import { dashboardTabs } from "./data/constants";
 
-const Dashboard = () => {
+const DashboardPage = () => {
   return (
     <div className="space-y-6">
       {/* top */}
@@ -10,7 +10,7 @@ const Dashboard = () => {
       </section>
       {/* tabs */}
       <section>
-        <Tabs defaultValue={dashboardTabs[0].label} className="space-y-6">
+        <Tabs defaultValue={dashboardTabs[1].label} className="space-y-6">
           <TabsList>
             {dashboardTabs.map((item) => (
               <TabsTrigger key={item.label} value={item.label}>
@@ -29,4 +29,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardPage;

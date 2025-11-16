@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import clsx from "clsx";
 import { Activity, ChartLine, Clock4, User } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 const dashboardTraffic = [
@@ -189,32 +190,49 @@ type BarList = {
 
 const BarList = ({ items, barBg, valueFormatter }: BarList) => {
   const max = Math.max(...items.map((i) => i.value), 1);
+  const [animatedWidths, setAnimatedWidths] = useState<string[]>(
+    items.map(() => "0%")
+  );
+
+  useEffect(() => {
+    // Trigger animation sau khi render
+    const timer = setTimeout(() => {
+      setAnimatedWidths(
+        items.map((item) => {
+          const w = Math.round((item.value / max) * 100);
+          return `${w}%`;
+        })
+      );
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [items, max]);
 
   return (
     <ul className="space-y-4">
-      {items.map((item, idx) => {
-        const width = `${Math.round((item.value / max) * 100)}%`;
+      {items.map((item, idx) => (
+        <li key={idx}>
+          <div className="mb-1 text-muted-foreground text-xs truncate">
+            {item.name}
+          </div>
 
-        return (
-          <li key={idx}>
-            <div className="mb-1 text-muted-foreground text-xs truncate">
-              {item.name}
+          <div className="flex items-center gap-4">
+            <div className="bg-muted h-2.5 w-full rounded-full overflow-hidden">
+              <div
+                className={clsx([
+                  "h-full rounded-full transition-all duration-1000",
+                  barBg,
+                ])}
+                style={{ width: animatedWidths[idx] }}
+              ></div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="bg-muted h-2.5 w-full rounded-full">
-                <div
-                  className={clsx([`h-full rounded-full`, barBg])}
-                  style={{ width: width }}
-                ></div>
-              </div>
 
-              <div className="text-xs font-medium ps-2">
-                {valueFormatter ? valueFormatter(item.value) : item.value}
-              </div>
+            <div className="text-xs font-medium ps-2">
+              {valueFormatter ? valueFormatter(item.value) : item.value}
             </div>
-          </li>
-        );
-      })}
+          </div>
+        </li>
+      ))}
     </ul>
   );
 };
