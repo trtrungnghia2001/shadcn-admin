@@ -6,7 +6,7 @@ const DashboardPage = () => {
     <div className="space-y-6">
       {/* top */}
       <section>
-        <h1>Dashboard</h1>
+        <h2>Dashboard</h2>
       </section>
       {/* tabs */}
       <section>

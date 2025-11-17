@@ -1,18 +1,19 @@
 import { DataTable } from "@/components/customs/data-table";
-import { tasks } from "./data/data";
-import { DataTableColumn } from "./components/dttb-columns";
 import { useDataTable } from "@/components/customs/data-table/hooks/use-data-table";
 import { DataTablePagination } from "@/components/customs/data-table/components/DataTablePagination";
 import { DataTableBulkActions } from "@/components/customs/data-table/components/DataTableBulkActions";
 import { DataTableToolbar } from "@/components/customs/data-table/components/DataTableToolbar";
-import { priorities, statuses } from "./data/constants";
+
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import ButtonImport from "@/components/customs/button-import";
+import { usersData } from "./data/data";
+import { DataTableColumn } from "./components/dttb-columns";
+import { roles, statuses } from "./data/constants";
 
-const TasksPage = () => {
+const UsersPage = () => {
   const { table } = useDataTable({
-    data: tasks,
+    data: usersData,
     columns: DataTableColumn,
   });
 
@@ -21,9 +22,9 @@ const TasksPage = () => {
       {/* top */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2>Tasks</h2>
+          <h2>User List</h2>
           <p className="text-muted-foreground">
-            Here's a list of your tasks for this month!
+            Manage your users and their roles here.
           </p>
         </div>
         <div className="flex gap-2">
@@ -46,9 +47,9 @@ const TasksPage = () => {
         filters={[
           { columnId: "status", title: "Status", options: statuses },
           {
-            columnId: "priority",
-            title: "Priority",
-            options: priorities,
+            columnId: "role",
+            title: "Role",
+            options: roles,
           },
         ]}
       />
@@ -62,4 +63,4 @@ const TasksPage = () => {
   );
 };
 
-export default TasksPage;
+export default UsersPage;

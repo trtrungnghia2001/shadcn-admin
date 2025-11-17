@@ -40,7 +40,7 @@ export interface DataTableBulkActionsProps<TData> {
  */
 export function DataTableBulkActions<TData>({
   table,
-  entityName,
+  entityName = "items",
   items,
 }: DataTableBulkActionsProps<TData>): React.ReactNode | null {
   const selectedRows = table.getFilteredSelectedRowModel().rows;
