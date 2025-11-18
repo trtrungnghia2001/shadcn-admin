@@ -17,7 +17,7 @@ export interface DataTableBulkActionsProps<TData> {
   items?: {
     title: string;
     icon: React.ReactNode;
-    onClick: () => void;
+    onClick?: () => void;
     variant?:
       | "link"
       | "default"
@@ -216,28 +216,32 @@ export function DataTableBulkActions<TData>({
             aria-hidden="true"
           />
 
-          {items?.map((item, idx) => (
-            <Tooltip key={idx}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={item.variant || "outline"}
-                  size="icon"
-                  onClick={() => {
-                    item.onClick();
-                  }}
-                  className="size-8"
-                  aria-label={item.title}
-                  title={item.title}
-                >
-                  {item.icon}
-                  <span className="sr-only">{item.title}</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{item.title} selected</p>
-              </TooltipContent>
-            </Tooltip>
-          ))}
+          {items?.map((item, idx) => {
+            return (
+              <Tooltip key={idx}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={item.variant || "outline"}
+                    size="icon"
+                    onClick={() => {
+                      if (item.onClick) {
+                        item.onClick();
+                      }
+                    }}
+                    className="size-8"
+                    aria-label={item.title}
+                    title={item.title}
+                  >
+                    {item.icon}
+                    <span className="sr-only">{item.title}</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{item.title} selected</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
         </div>
       </div>
     </>
