@@ -1,5 +1,4 @@
 import { DataTable } from "@/components/customs/data-table";
-import { tasks } from "./data/data";
 import { DataTableColumn } from "./components/dttb-columns";
 import { useDataTable } from "@/components/customs/data-table/hooks/use-data-table";
 import { DataTablePagination } from "@/components/customs/data-table/components/DataTablePagination";
@@ -13,21 +12,18 @@ import {
   exportToXLSX,
   importXLSX,
 } from "@/components/customs/data-table/utils/import-export-file";
-import { useEffect, useState } from "react";
 import type { Task } from "./data/type";
-import { toast } from "sonner";
+import TaskSheet from "./components/TaskSheet";
+import { useTaskContext } from "./data/context";
+import { useState } from "react";
 
 const TasksPage = () => {
-  const [data, setData] = useState<Task[]>(() => {
-    const tasksLocal = localStorage.getItem("tasks-data");
-    return tasksLocal ? JSON.parse(tasksLocal) : tasks;
-  });
-  useEffect(() => {
-    localStorage.setItem("tasks-data", JSON.stringify(data));
-  }, [data]);
+  const { edit, setEdit, tasks, handleDeleteSelectTask, handleImportTask } =
+    useTaskContext();
+  const [openSheet, setOpenSheet] = useState(false);
 
   const { table } = useDataTable({
-    data: data,
+    data: tasks,
     columns: DataTableColumn,
   });
 
@@ -45,19 +41,21 @@ const TasksPage = () => {
           <ButtonImport
             handleImport={async (file) => {
               const dataImport = (await importXLSX(file)) as Task[];
-
-              setData((prev) => [...prev, ...dataImport]);
+              handleImportTask(dataImport);
             }}
           />
-          <Button
-            className="space-x-1"
-            onClick={() => toast.error(`err`)}
-            // onClick={() => setOpen("create")}
-          >
+          <Button className="space-x-1" onClick={() => setOpenSheet(true)}>
             <span>Create</span> <Plus size={18} />
           </Button>
         </div>
       </div>
+      <TaskSheet
+        open={openSheet || edit.isEdit}
+        onOpenChange={(open) => {
+          setOpenSheet(open);
+          setEdit({ isEdit: false, taskEdit: null });
+        }}
+      />
       {/* toolbar */}
       <DataTableToolbar
         table={table}
@@ -94,13 +92,10 @@ const TasksPage = () => {
             title: "Delete",
             variant: "destructive",
             onClick: () => {
-              const rowIds = table
-                .getFilteredSelectedRowModel()
-                .rows.map((r) => r.original)
-                .map((r) => r.id);
-              setData((prev) =>
-                prev.filter((item) => !rowIds.includes(item.id))
+              handleDeleteSelectTask(
+                table.getFilteredSelectedRowModel().rows.map((r) => r.original)
               );
+
               table.resetRowSelection();
             },
           },

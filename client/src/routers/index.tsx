@@ -1,5 +1,6 @@
 import AppPage from "@/features/apps";
 import DashboardPage from "@/features/dashboard";
+import { TaskProvider } from "@/features/tasks/data/provider";
 import TasksPage from "@/features/tasks/TasksPage";
 import UsersPage from "@/features/users/UsersPage";
 import { useRoutes } from "react-router-dom";
@@ -12,7 +13,11 @@ const RouterTree = () => {
     },
     {
       path: "tasks",
-      element: <TasksPage />,
+      element: (
+        <TaskProvider>
+          <TasksPage />,
+        </TaskProvider>
+      ),
     },
     {
       path: "apps",

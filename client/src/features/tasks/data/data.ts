@@ -4,7 +4,7 @@ import type { Task } from "./type";
 // Set a fixed seed for consistent data generation
 faker.seed(12345);
 
-export const tasks: Task[] = Array.from({ length: 100 }, () => {
+export const tasksData: Task[] = Array.from({ length: 100 }, () => {
   const statuses = [
     "todo",
     "in progress",

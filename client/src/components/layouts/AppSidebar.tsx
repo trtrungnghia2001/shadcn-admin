@@ -27,12 +27,12 @@ export function AppSidebar() {
       <SidebarHeader className="bg-background">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <div className="flex items-center gap-2 rounded-md">
+            <SidebarMenuButton className="p-2">
+              <div className="flex items-center gap-2">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground size-8 rounded-md flex items-center justify-center">
                   <VenusAndMars size={16} />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 text-left">
                   <p className="font-semibold text-sm">Shadcn Admin</p>
                   <p className="text-xs">Vite + ShadcnUI</p>
                 </div>
