@@ -75,8 +75,6 @@ const TaskSheet = ({ open, onOpenChange, ...props }: DialogProps) => {
     }
   }, [edit]);
 
-  console.log({ edit });
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent className="w-[400px] sm:w-[540px]">
@@ -198,7 +196,7 @@ const TaskSheet = ({ open, onOpenChange, ...props }: DialogProps) => {
         <SheetFooter className="gap-2">
           <Button form="tasks-form" type="submit">
             Save changes
-          </Button>{" "}
+          </Button>
           <SheetClose asChild>
             <Button variant="outline">Close</Button>
           </SheetClose>

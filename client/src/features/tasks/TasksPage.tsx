@@ -16,10 +16,18 @@ import type { Task } from "./data/type";
 import TaskSheet from "./components/TaskSheet";
 import { useTaskContext } from "./data/context";
 import { useState } from "react";
+import ConfirmDialog from "@/components/customs/confirm-dialog";
 
 const TasksPage = () => {
-  const { edit, setEdit, tasks, handleDeleteSelectTask, handleImportTask } =
-    useTaskContext();
+  const {
+    edit,
+    setEdit,
+    tasks,
+    handleDeleteSelectTask,
+    handleImportTask,
+    dialog,
+    setDialog,
+  } = useTaskContext();
   const [openSheet, setOpenSheet] = useState(false);
 
   const { table } = useDataTable({
@@ -49,13 +57,7 @@ const TasksPage = () => {
           </Button>
         </div>
       </div>
-      <TaskSheet
-        open={openSheet || edit.isEdit}
-        onOpenChange={(open) => {
-          setOpenSheet(open);
-          setEdit({ isEdit: false, taskEdit: null });
-        }}
-      />
+
       {/* toolbar */}
       <DataTableToolbar
         table={table}
@@ -92,14 +94,36 @@ const TasksPage = () => {
             title: "Delete",
             variant: "destructive",
             onClick: () => {
-              handleDeleteSelectTask(
-                table.getFilteredSelectedRowModel().rows.map((r) => r.original)
-              );
+              setDialog({
+                isOpen: true,
+                handleConfirmDelete: () => {
+                  handleDeleteSelectTask(
+                    table
+                      .getFilteredSelectedRowModel()
+                      .rows.map((r) => r.original)
+                  );
 
-              table.resetRowSelection();
+                  table.resetRowSelection();
+                },
+              });
             },
           },
         ]}
+      />
+      {/* dialog */}
+      <TaskSheet
+        open={openSheet || edit.isEdit}
+        onOpenChange={(open) => {
+          setOpenSheet(open);
+          setEdit({ isEdit: false, taskEdit: null });
+        }}
+      />
+      <ConfirmDialog
+        handleConfirm={() => dialog.handleConfirmDelete()}
+        confirmText="Delete"
+        open={dialog.isOpen}
+        onOpenChange={(open) => setDialog({ ...dialog, isOpen: open })}
+        confirmVariant="destructive"
       />
     </div>
   );

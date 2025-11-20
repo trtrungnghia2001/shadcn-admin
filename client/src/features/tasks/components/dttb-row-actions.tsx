@@ -6,20 +6,22 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Row } from "@tanstack/react-table";
+import type { Row, Table } from "@tanstack/react-table";
 import { Ellipsis, Pencil, Trash2 } from "lucide-react";
 import type { Task } from "../data/type";
 import { useTaskContext } from "../data/context";
 
 type DataTableRowActionsProps<TData> = {
   row: Row<TData>;
+  table: Table<TData>;
 };
 
 export function DataTableRowActions<TData>({
   row,
+  table,
 }: DataTableRowActionsProps<TData>) {
   const data = row.original as Task;
-  const { handleDeleteTask, setEdit } = useTaskContext();
+  const { handleDeleteTask, setEdit, setDialog } = useTaskContext();
 
   return (
     <DropdownMenu modal={false}>
@@ -49,7 +51,13 @@ export function DataTableRowActions<TData>({
 
         <DropdownMenuItem
           onClick={() => {
-            handleDeleteTask(data);
+            setDialog({
+              isOpen: true,
+              handleConfirmDelete: () => {
+                handleDeleteTask(data);
+                table.resetRowSelection();
+              },
+            });
           }}
         >
           Delete

@@ -16,6 +16,10 @@ export type TaskEditType = {
   taskEdit: Task | null;
   isEdit: boolean;
 };
+export type TaskDialogType = {
+  isOpen: boolean;
+  handleConfirmDelete: () => void;
+};
 export type TaskContextType = {
   tasks: Task[];
   handleAddTask: (task: Task) => void;
@@ -25,4 +29,6 @@ export type TaskContextType = {
   handleImportTask: (tasks: Task[]) => void;
   edit: TaskEditType;
   setEdit: (edit: TaskEditType) => void;
+  dialog: TaskDialogType;
+  setDialog: (dialog: TaskDialogType) => void;
 };
