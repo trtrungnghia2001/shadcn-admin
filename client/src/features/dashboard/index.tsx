@@ -10,10 +10,14 @@ const DashboardPage = () => {
       </section>
       {/* tabs */}
       <section>
-        <Tabs defaultValue={dashboardTabs[1].label} className="space-y-6">
+        <Tabs defaultValue={dashboardTabs[0].label} className="space-y-6">
           <TabsList>
             {dashboardTabs.map((item) => (
-              <TabsTrigger key={item.label} value={item.label}>
+              <TabsTrigger
+                key={item.label}
+                value={item.label}
+                disabled={item.disabled}
+              >
                 {item.label}
               </TabsTrigger>
             ))}

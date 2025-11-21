@@ -13,9 +13,11 @@ export const dashboardTabs = [
   {
     label: `Reports`,
     element: <TabsOverview />,
+    disabled: true,
   },
   {
     label: `Notifications`,
     element: <TabsOverview />,
+    disabled: true,
   },
 ];

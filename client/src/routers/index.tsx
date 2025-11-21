@@ -4,6 +4,9 @@ import { TaskProvider } from "@/features/tasks/data/provider";
 import TasksPage from "@/features/tasks/TasksPage";
 import UsersPage from "@/features/users/UsersPage";
 import { useRoutes } from "react-router-dom";
+import ErrorRouter from "./(errors)";
+import AuthRouter from "./(auth)";
+import { ComingSoon } from "@/components/layouts/ComingSoon";
 
 const RouterTree = () => {
   const routers = useRoutes([
@@ -26,6 +29,18 @@ const RouterTree = () => {
     {
       path: "users",
       element: <UsersPage />,
+    },
+    {
+      path: "auth/*",
+      element: <AuthRouter />,
+    },
+    {
+      path: "errors/*",
+      element: <ErrorRouter />,
+    },
+    {
+      path: "*",
+      element: <ComingSoon />,
     },
   ]);
   return routers;

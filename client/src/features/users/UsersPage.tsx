@@ -10,6 +10,7 @@ import ButtonImport from "@/components/customs/button-import";
 import { usersData } from "./data/data";
 import { DataTableColumn } from "./components/dttb-columns";
 import { roles, statuses } from "./data/constants";
+import UserDialog from "./components/UserDialog";
 
 const UsersPage = () => {
   const { table } = useDataTable({
@@ -59,6 +60,7 @@ const UsersPage = () => {
       <DataTablePagination table={table} />
       {/* bulk actions */}
       <DataTableBulkActions table={table} />
+      <UserDialog open />
     </div>
   );
 };

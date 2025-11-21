@@ -17,9 +17,9 @@ import {
 import { sidebarLinks } from "@/constants/links";
 
 import clsx from "clsx";
-import { VenusAndMars } from "lucide-react";
+import { ChevronRight, VenusAndMars } from "lucide-react";
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 export function AppSidebar() {
   return (
@@ -77,7 +77,10 @@ const AppSidebarItem = ({
   label,
   path,
 }: SidebarItemProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const isActiveGroup =
+    items && items.some((child) => location.pathname.includes(child.path!));
+  const [isOpen, setIsOpen] = useState(isActiveGroup);
 
   // ---- path → NavLink ----
   if (path) {
@@ -86,12 +89,12 @@ const AppSidebarItem = ({
         to={path}
         className={({ isActive }) =>
           clsx([
-            `flex items-center gap-2 p-2 rounded-md hover:bg-sidebar-accent`,
+            `flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-sidebar-accent`,
             isActive && `bg-sidebar-accent font-semibold`,
           ])
         }
       >
-        {Icon && <Icon size={18} />}
+        {Icon && <Icon size={16} />}
         <span>{label}</span>
       </NavLink>
     );
@@ -100,12 +103,26 @@ const AppSidebarItem = ({
   // ---- items → Collapsible ----
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger className="flex items-center gap-2 w-full cursor-pointer p-2 rounded-md hover:bg-sidebar-accent">
-        {Icon && <Icon size={16} />}
-        <span>{label}</span>
+      <CollapsibleTrigger className="flex items-center justify-between gap-2 w-full cursor-pointer py-1.5 px-2 rounded-md hover:bg-sidebar-accent">
+        <div className="flex items-center gap-2">
+          {Icon && <Icon size={16} />}
+          <span>{label}</span>
+        </div>
+        <ChevronRight
+          size={16}
+          className={clsx([
+            "transition-transform duration-200",
+            isOpen ? "rotate-90" : "rotate-0",
+          ])}
+        />
       </CollapsibleTrigger>
 
-      <CollapsibleContent className="ml-4 mt-2 flex flex-col gap-1">
+      <CollapsibleContent
+        className={clsx(
+          "ml-4 border-l pl-2 mt-2 flex flex-col gap-1 overflow-hidden",
+          "data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up"
+        )}
+      >
         {items?.map((child) => (
           <AppSidebarItem {...child} key={child.label} />
         ))}

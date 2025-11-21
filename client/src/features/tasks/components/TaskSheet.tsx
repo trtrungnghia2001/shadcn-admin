@@ -79,10 +79,14 @@ const TaskSheet = ({ open, onOpenChange, ...props }: DialogProps) => {
     <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent className="w-[400px] sm:w-[540px]">
         <SheetHeader>
-          <SheetTitle>Create Task</SheetTitle>
+          <SheetTitle>
+            {!edit.isEdit ? `Create Task` : `Update Task`}
+          </SheetTitle>
           <SheetDescription>
-            Add a new task by providing necessary info.Click save when you're
-            done.
+            {!edit.isEdit
+              ? `Add a new task by providing necessary info.Click save when you're
+            done.`
+              : `Update the task by providing necessary info.Click save when you're done.`}
           </SheetDescription>
         </SheetHeader>
 
