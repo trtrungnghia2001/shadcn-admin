@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useState } from "react";
-import type { Task, TaskDialogType, TaskEditType } from "./type";
+import type { Task, TasksDialogType } from "./type";
 import { TaskContext, taskReducer } from "./context";
 import { tasksData } from "./data";
 
@@ -21,7 +21,8 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
       type: "UPDATE",
       payload: task,
     });
-    setEdit({ isEdit: false, taskEdit: null });
+    setOpen("update");
+    setCurrentData(null);
   };
   const handleDeleteTask = (task: Task) => {
     dispatch({
@@ -46,16 +47,8 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("tasksData", JSON.stringify(tasks));
   }, [tasks]);
 
-  const [edit, setEdit] = useState<TaskEditType>({
-    isEdit: false,
-    taskEdit: null,
-  });
-
-  // dialog
-  const [dialog, setDialog] = useState<TaskDialogType>({
-    isOpen: false,
-    handleConfirmDelete: () => {},
-  });
+  const [open, setOpen] = useState<TasksDialogType>(false);
+  const [currentData, setCurrentData] = useState<Task | null>(null);
 
   return (
     <TaskContext.Provider
@@ -66,10 +59,10 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
         handleUpdateTask,
         handleDeleteSelectTask,
         handleImportTask,
-        edit,
-        setEdit,
-        dialog,
-        setDialog,
+        open,
+        setOpen,
+        currentData,
+        setCurrentData,
       }}
     >
       {children}

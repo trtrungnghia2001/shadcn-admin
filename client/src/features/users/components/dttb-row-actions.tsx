@@ -10,6 +10,7 @@ import {
 import type { Row } from "@tanstack/react-table";
 import { Ellipsis, Pencil, Trash2 } from "lucide-react";
 import type { User } from "../data/type";
+import { useUserStore } from "../data/store";
 
 type DataTableRowActionsProps<TData> = {
   row: Row<TData>;
@@ -19,7 +20,7 @@ export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const data = row.original as User;
-  console.log({ data });
+  const { setCurrentData, setOpen } = useUserStore();
 
   return (
     <DropdownMenu modal={false}>
@@ -32,11 +33,11 @@ export function DataTableRowActions<TData>({
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align="end">
         <DropdownMenuItem
           onClick={() => {
-            // setCurrentRow(task)
-            // setOpen('update')
+            setCurrentData(data);
+            setOpen("update");
           }}
         >
           Edit
@@ -47,8 +48,8 @@ export function DataTableRowActions<TData>({
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
-            // setCurrentRow(task)
-            // setOpen('delete')
+            setCurrentData(data);
+            setOpen("delete");
           }}
         >
           Delete

@@ -18,10 +18,9 @@ type DataTableRowActionsProps<TData> = {
 
 export function DataTableRowActions<TData>({
   row,
-  table,
 }: DataTableRowActionsProps<TData>) {
   const data = row.original as Task;
-  const { handleDeleteTask, setEdit, setDialog } = useTaskContext();
+  const { setCurrentData, setOpen } = useTaskContext();
 
   return (
     <DropdownMenu modal={false}>
@@ -37,10 +36,8 @@ export function DataTableRowActions<TData>({
       <DropdownMenuContent align="end">
         <DropdownMenuItem
           onClick={() => {
-            setEdit({
-              isEdit: true,
-              taskEdit: data,
-            });
+            setOpen("update");
+            setCurrentData(data);
           }}
         >
           Edit
@@ -51,13 +48,8 @@ export function DataTableRowActions<TData>({
 
         <DropdownMenuItem
           onClick={() => {
-            setDialog({
-              isOpen: true,
-              handleConfirmDelete: () => {
-                handleDeleteTask(data);
-                table.resetRowSelection();
-              },
-            });
+            setOpen("delete");
+            setCurrentData(data);
           }}
         >
           Delete

@@ -15,20 +15,19 @@ import {
 import type { Task } from "./data/type";
 import TaskSheet from "./components/TaskSheet";
 import { useTaskContext } from "./data/context";
-import { useState } from "react";
 import ConfirmDialog from "@/components/customs/confirm-dialog";
 
 const TasksPage = () => {
   const {
-    edit,
-    setEdit,
     tasks,
-    handleDeleteSelectTask,
     handleImportTask,
-    dialog,
-    setDialog,
+    handleDeleteTask,
+    handleDeleteSelectTask,
+    setOpen,
+    open,
+    setCurrentData,
+    currentData,
   } = useTaskContext();
-  const [openSheet, setOpenSheet] = useState(false);
 
   const { table } = useDataTable({
     data: tasks,
@@ -52,7 +51,7 @@ const TasksPage = () => {
               handleImportTask(dataImport);
             }}
           />
-          <Button className="space-x-1" onClick={() => setOpenSheet(true)}>
+          <Button className="space-x-1" onClick={() => setOpen("create")}>
             <span>Create</span> <Plus size={18} />
           </Button>
         </div>
@@ -94,36 +93,38 @@ const TasksPage = () => {
             title: "Delete",
             variant: "destructive",
             onClick: () => {
-              setDialog({
-                isOpen: true,
-                handleConfirmDelete: () => {
-                  handleDeleteSelectTask(
-                    table
-                      .getFilteredSelectedRowModel()
-                      .rows.map((r) => r.original)
-                  );
-
-                  table.resetRowSelection();
-                },
-              });
+              setOpen("deleteSelect");
             },
           },
         ]}
       />
       {/* dialog */}
+
       <TaskSheet
-        open={openSheet || edit.isEdit}
-        onOpenChange={(open) => {
-          setOpenSheet(open);
-          setEdit({ isEdit: false, taskEdit: null });
+        open={open === "create" || open === "update"}
+        onOpenChange={() => {
+          setOpen(false);
+          setCurrentData(null);
         }}
       />
       <ConfirmDialog
-        handleConfirm={() => dialog.handleConfirmDelete()}
+        open={open === "delete" || open === "deleteSelect"}
+        onOpenChange={() => {
+          setOpen(false);
+          setCurrentData(null);
+        }}
         confirmText="Delete"
-        open={dialog.isOpen}
-        onOpenChange={(open) => setDialog({ ...dialog, isOpen: open })}
         confirmVariant="destructive"
+        handleConfirm={() => {
+          if (open === "delete" && currentData) {
+            handleDeleteTask(currentData);
+          } else if (open === "deleteSelect") {
+            handleDeleteSelectTask(
+              table.getFilteredSelectedRowModel().rows.map((r) => r.original)
+            );
+          }
+          table.resetRowSelection();
+        }}
       />
     </div>
   );

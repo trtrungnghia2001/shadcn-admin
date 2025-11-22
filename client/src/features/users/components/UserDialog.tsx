@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 const UserDialog = ({ ...props }: DialogProps) => {
   return (
     <Dialog {...props}>
-      <DialogContent className="sm:max-w-[425px] overflow-y-auto h-[calc(100vh-2rem)]">
+      <DialogContent className="sm:max-w-lg overflow-y-auto h-[calc(100vh-2rem)]">
         <DialogHeader>
-          <DialogTitle>Add New User</DialogTitle>
+          <DialogTitle className="text-lg">Add New User</DialogTitle>
           <DialogDescription>
             Create new user here. Click save when you're done.
           </DialogDescription>

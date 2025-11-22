@@ -12,14 +12,6 @@ export type ContextActionType =
   | { type: "IMPORT"; dataArray: Task[] }
   | { type: "DELETE_SELECTED"; dataArray: Task[] };
 
-export type TaskEditType = {
-  taskEdit: Task | null;
-  isEdit: boolean;
-};
-export type TaskDialogType = {
-  isOpen: boolean;
-  handleConfirmDelete: () => void;
-};
 export type TaskContextType = {
   tasks: Task[];
   handleAddTask: (task: Task) => void;
@@ -27,8 +19,15 @@ export type TaskContextType = {
   handleDeleteTask: (task: Task) => void;
   handleDeleteSelectTask: (tasks: Task[]) => void;
   handleImportTask: (tasks: Task[]) => void;
-  edit: TaskEditType;
-  setEdit: (edit: TaskEditType) => void;
-  dialog: TaskDialogType;
-  setDialog: (dialog: TaskDialogType) => void;
+
+  open: TasksDialogType;
+  setOpen: (open: TasksDialogType) => void;
+  currentData: Task | null;
+  setCurrentData: (task: Task | null) => void;
 };
+export type TasksDialogType =
+  | "create"
+  | "update"
+  | "delete"
+  | "deleteSelect"
+  | boolean;

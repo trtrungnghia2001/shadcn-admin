@@ -11,8 +11,10 @@ import { usersData } from "./data/data";
 import { DataTableColumn } from "./components/dttb-columns";
 import { roles, statuses } from "./data/constants";
 import UserDialog from "./components/UserDialog";
+import { useUserStore } from "./data/store";
 
 const UsersPage = () => {
+  const { open, setOpen } = useUserStore();
   const { table } = useDataTable({
     data: usersData,
     columns: DataTableColumn,
@@ -34,10 +36,7 @@ const UsersPage = () => {
               console.log({ file });
             }}
           />
-          <Button
-            className="space-x-1"
-            // onClick={() => setOpen("create")}
-          >
+          <Button className="space-x-1" onClick={() => setOpen("create")}>
             <span>Create</span> <Plus size={18} />
           </Button>
         </div>
@@ -60,7 +59,11 @@ const UsersPage = () => {
       <DataTablePagination table={table} />
       {/* bulk actions */}
       <DataTableBulkActions table={table} />
-      <UserDialog open />
+      {/* dialog */}
+      <UserDialog
+        open={open === "create" || open === "update"}
+        onOpenChange={() => setOpen(false)}
+      />
     </div>
   );
 };

@@ -25,9 +25,7 @@ export const taskReducer = (state: Task[], action: ContextActionType) => {
   }
 };
 
-export const TaskContext = createContext<TaskContextType | undefined>(
-  undefined
-);
+export const TaskContext = createContext<TaskContextType | null>(null);
 
 export const useTaskContext = (): TaskContextType => {
   const ctx = useContext(TaskContext);

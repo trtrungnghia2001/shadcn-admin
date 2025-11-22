@@ -1,3 +1,5 @@
+import type { ApiResponse } from "@/lib/type";
+
 export interface User {
   id: string;
   firstName: string;
@@ -10,3 +12,20 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
 }
+
+type UsersDialogType = "create" | "update" | "delete" | boolean;
+
+export type UserStoreType<T> = {
+  data: T[];
+  create: (user: Partial<T>) => Promise<ApiResponse<T>>;
+  update: (id: string, user: Partial<T>) => Promise<ApiResponse<T>>;
+  delete: (id: string) => Promise<ApiResponse<T>>;
+  fetchAll: () => Promise<ApiResponse<T[]>>;
+  fetchById: (id: string) => Promise<ApiResponse<T>>;
+
+  // dialog
+  open: UsersDialogType;
+  setOpen: (open: UsersDialogType) => void;
+  currentData: User | null;
+  setCurrentData: (user: User | null) => void;
+};
