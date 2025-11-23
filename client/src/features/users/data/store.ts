@@ -2,9 +2,10 @@ import { create } from "zustand";
 import type { User, UserStoreType } from "./type";
 import axiosInstance from "@/lib/axios";
 import type { ApiResponse } from "@/lib/type";
+import { usersData } from "./data";
 
 export const useUserStore = create<UserStoreType<User>>()((set, get) => ({
-  data: [],
+  data: usersData,
   create: async (user) => {
     const resp = (await axiosInstance.post<ApiResponse<User>>("/users", user))
       .data;
@@ -24,7 +25,7 @@ export const useUserStore = create<UserStoreType<User>>()((set, get) => ({
     });
     return resp;
   },
-  delete: async (id) => {
+  remove: async (id) => {
     const resp = (await axiosInstance.delete<ApiResponse<User>>("/users/" + id))
       .data;
     set({

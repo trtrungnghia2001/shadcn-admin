@@ -10,22 +10,32 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+interface BulkItemActionProps {
+  title: string;
+  icon?: React.ReactNode;
+  onClick?: () => void;
+  variant?:
+    | "link"
+    | "default"
+    | "secondary"
+    | "destructive"
+    | "outline"
+    | "ghost";
+  list?: BulkItemActionProps[];
+}
 
 export interface DataTableBulkActionsProps<TData> {
   table: Table<TData>;
   entityName?: string;
-  items?: {
-    title: string;
-    icon: React.ReactNode;
-    onClick?: () => void;
-    variant?:
-      | "link"
-      | "default"
-      | "secondary"
-      | "destructive"
-      | "outline"
-      | "ghost";
-  }[];
+  items?: BulkItemActionProps[];
+  children?: React.ReactNode;
 }
 
 /**
@@ -42,6 +52,7 @@ export function DataTableBulkActions<TData>({
   table,
   entityName = "items",
   items,
+  children,
 }: DataTableBulkActionsProps<TData>): React.ReactNode | null {
   const selectedRows = table.getFilteredSelectedRowModel().rows;
   const selectedCount = selectedRows.length;
@@ -216,34 +227,71 @@ export function DataTableBulkActions<TData>({
             aria-hidden="true"
           />
 
-          {items?.map((item, idx) => {
-            return (
-              <Tooltip key={idx}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={item.variant || "outline"}
-                    size="icon"
-                    onClick={() => {
-                      if (item.onClick) {
-                        item.onClick();
-                      }
-                    }}
-                    className="size-8"
-                    aria-label={item.title}
-                    title={item.title}
-                  >
-                    {item.icon}
-                    <span className="sr-only">{item.title}</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{item.title} selected</p>
-                </TooltipContent>
-              </Tooltip>
-            );
-          })}
+          {items?.map((item, idx) => (
+            <DataTableBulkItemActions item={item} key={idx} />
+          ))}
+
+          {children}
         </div>
       </div>
     </>
+  );
+}
+
+export function DataTableBulkItemActions({
+  item,
+}: {
+  item: BulkItemActionProps;
+}) {
+  if (item.list && item.list.length > 0)
+    return (
+      <DropdownMenu>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <Button variant={item.variant || "outline"} size="icon">
+                {item.icon}
+                <span className="sr-only">{item.title}</span>
+              </Button>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{item.title}</p>
+          </TooltipContent>
+        </Tooltip>
+        <DropdownMenuContent>
+          {item.list.map((subItem, i) => (
+            <DropdownMenuItem key={i} onClick={() => subItem.onClick?.()}>
+              {subItem.icon}
+              {subItem.title}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant={item.variant || "outline"}
+          size="icon"
+          onClick={() => {
+            if (item.onClick) {
+              item.onClick();
+            }
+          }}
+          className="size-8"
+          aria-label={item.title}
+          title={item.title}
+        >
+          {item.icon}
+          <span className="sr-only">{item.title}</span>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{item.title}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }

@@ -1,14 +1,17 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import Header from "./Header";
+import { Outlet } from "react-router-dom";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="px-4 py-6 flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden flex flex-col">
         <Header />
-        {children}
+        <section className="flex-1 p-4">
+          <Outlet />
+        </section>
       </main>
     </SidebarProvider>
   );

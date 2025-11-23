@@ -2,20 +2,17 @@ import { DataTable } from "@/components/customs/data-table";
 import { DataTableColumn } from "./components/dttb-columns";
 import { useDataTable } from "@/components/customs/data-table/hooks/use-data-table";
 import { DataTablePagination } from "@/components/customs/data-table/components/DataTablePagination";
-import { DataTableBulkActions } from "@/components/customs/data-table/components/DataTableBulkActions";
 import { DataTableToolbar } from "@/components/customs/data-table/components/DataTableToolbar";
 import { priorities, statuses } from "./data/constants";
 import { Button } from "@/components/ui/button";
-import { Download, Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import ButtonImport from "@/components/customs/button-import";
-import {
-  exportToXLSX,
-  importXLSX,
-} from "@/components/customs/data-table/utils/import-export-file";
+import { importXLSX } from "@/components/customs/data-table/utils/import-export-file";
 import type { Task } from "./data/type";
 import TaskSheet from "./components/TaskSheet";
 import { useTaskContext } from "./data/context";
 import ConfirmDialog from "@/components/customs/confirm-dialog";
+import DttbBulkActions from "./components/dttb-bulk-action";
 
 const TasksPage = () => {
   const {
@@ -74,30 +71,7 @@ const TasksPage = () => {
       {/* pagination */}
       <DataTablePagination table={table} />
       {/* bulk actions */}
-      <DataTableBulkActions
-        table={table}
-        entityName="tasks"
-        items={[
-          {
-            icon: <Download />,
-            title: "Download",
-            onClick: () => {
-              const rows = table
-                .getFilteredSelectedRowModel()
-                .rows.map((r) => r.original);
-              exportToXLSX(`selected.xlsx`, rows);
-            },
-          },
-          {
-            icon: <Trash2 />,
-            title: "Delete",
-            variant: "destructive",
-            onClick: () => {
-              setOpen("deleteSelect");
-            },
-          },
-        ]}
-      />
+      <DttbBulkActions table={table} />
       {/* dialog */}
 
       <TaskSheet

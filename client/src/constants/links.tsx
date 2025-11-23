@@ -35,6 +35,7 @@ export const sidebarLinks = [
       {
         icon: ShieldCheck,
         label: "Auth",
+        path: "",
         items: [
           {
             path: "auth/signin",
@@ -61,6 +62,7 @@ export const sidebarLinks = [
       {
         icon: Bug,
         label: "Errors",
+        path: "",
         items: [
           {
             icon: CircleSlash,
@@ -91,13 +93,13 @@ export const sidebarLinks = [
       },
     ],
   },
-
   {
     label: "Other",
     items: [
       {
         icon: Settings,
         label: "Settings",
+        path: "",
         items: [
           { icon: User, path: "/settings/profile", label: "Profile" },
           { icon: Settings, path: "/settings/account", label: "Account" },

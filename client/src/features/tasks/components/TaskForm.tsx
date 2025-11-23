@@ -39,20 +39,15 @@ const defaultValues = {
 };
 
 const TaskForm = () => {
-  const {
-    handleAddTask,
-    handleUpdateTask,
-    open: openTask,
-    currentData,
-    setOpen,
-  } = useTaskContext();
+  const { handleAddTask, handleUpdateTask, open, currentData, setOpen } =
+    useTaskContext();
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues,
   });
 
   const onSubmit = (data: FormType) => {
-    if (openTask === "update" && currentData) {
+    if (open === "update" && currentData) {
       handleUpdateTask({ ...data, id: currentData.id });
     } else {
       handleAddTask(data as Task);
@@ -63,12 +58,12 @@ const TaskForm = () => {
   };
 
   useEffect(() => {
-    if (openTask === "update" && currentData) {
+    if (open === "update" && currentData) {
       form.reset(currentData);
     } else {
       form.reset(defaultValues);
     }
-  }, [openTask, currentData]);
+  }, [open, currentData]);
 
   return (
     <Form {...form}>

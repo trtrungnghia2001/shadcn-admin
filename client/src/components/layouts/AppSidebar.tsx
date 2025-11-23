@@ -6,6 +6,7 @@ import {
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -20,26 +21,21 @@ import clsx from "clsx";
 import { ChevronRight, VenusAndMars } from "lucide-react";
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function AppSidebar() {
   return (
     <Sidebar className="p-2">
-      <SidebarHeader className="bg-background">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton className="p-2">
-              <div className="flex items-center gap-2">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground size-8 rounded-md flex items-center justify-center">
-                  <VenusAndMars size={16} />
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="font-semibold text-sm">Shadcn Admin</p>
-                  <p className="text-xs">Vite + ShadcnUI</p>
-                </div>
-              </div>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      <SidebarHeader className="bg-background ">
+        <div className="flex items-center gap-2 p-2">
+          <div className="bg-sidebar-primary text-sidebar-primary-foreground size-8 rounded-md flex items-center justify-center">
+            <VenusAndMars size={16} />
+          </div>
+          <div className="flex-1 text-left">
+            <p className="font-semibold text-sm">Shadcn Admin</p>
+            <p className="text-xs">Vite + ShadcnUI</p>
+          </div>
+        </div>
       </SidebarHeader>
       <SidebarContent className="bg-background">
         {sidebarLinks.map(({ items, label }, idx) => (
@@ -60,6 +56,20 @@ export function AppSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter className="bg-background">
+        <div className="flex items-center gap-2 px-2">
+          <Avatar>
+            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarFallback>TTN</AvatarFallback>
+          </Avatar>
+          <div className="text-xs">
+            <p className="font-medium">satnaing</p>
+            <p className="text-muted-foreground font-normal">
+              satnaingdev@gmail.com
+            </p>
+          </div>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }

@@ -19,6 +19,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { roles, statuses } from "../data/constants";
+import { useEffect } from "react";
+import { useUserStore } from "../data/store";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "Please enter your name"),
@@ -32,18 +34,22 @@ const formSchema = z.object({
   role: z.string().min(1, "Please enter your name"),
 });
 
+const defaultValues = {
+  firstName: "",
+  lastName: "",
+  username: "",
+  email: "",
+  phoneNumber: "",
+  role: "",
+  status: "",
+};
+
 const UserForm = () => {
+  const { currentData, open } = useUserStore();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: "Tran",
-      lastName: "Linh",
-      username: "Phuong Linh",
-      email: "phuong@gmail.com",
-      phoneNumber: "123456789",
-      role: "superadmin",
-      status: "active",
-    },
+    defaultValues: defaultValues,
   });
 
   // 2. Define a submit handler.
@@ -52,6 +58,14 @@ const UserForm = () => {
     // ✅ This will be type-safe and validated.
     console.log(values);
   }
+
+  useEffect(() => {
+    if (open === "update" && currentData) {
+      form.reset(currentData);
+    } else {
+      form.reset(defaultValues);
+    }
+  }, [open, currentData]);
 
   return (
     <Form {...form}>
@@ -132,7 +146,12 @@ const UserForm = () => {
             <FormItem>
               <FormLabel>Status</FormLabel>
               <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(val) => {
+                    if (val !== "") field.onChange(val);
+                  }}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a status" />
                   </SelectTrigger>
@@ -156,7 +175,12 @@ const UserForm = () => {
             <FormItem>
               <FormLabel>Role</FormLabel>
               <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(val) => {
+                    if (val !== "") field.onChange(val);
+                  }}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>

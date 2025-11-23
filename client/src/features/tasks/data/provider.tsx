@@ -24,6 +24,18 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
     setOpen("update");
     setCurrentData(null);
   };
+  const handleUpdateSelectTask = (
+    tasks: Task[],
+    key: string,
+    value: string | number
+  ) => {
+    dispatch({
+      type: "UPDATE_SELECTED",
+      dataArray: tasks,
+      key,
+      value,
+    });
+  };
   const handleDeleteTask = (task: Task) => {
     dispatch({
       type: "DELETE",
@@ -55,8 +67,9 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         tasks,
         handleAddTask,
-        handleDeleteTask,
         handleUpdateTask,
+        handleUpdateSelectTask,
+        handleDeleteTask,
         handleDeleteSelectTask,
         handleImportTask,
         open,
