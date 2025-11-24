@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { UserModel } from "../models/user.js";
 import { signinSchema, signupSchema } from "../helpers/schema.js";
 import { ENV } from "../libs/env.js";
+import { authMiddleware } from "../middlewares/verifyAuth.js";
 
 const authRoute = express.Router();
 
@@ -77,4 +78,29 @@ authRoute.post(`/signin`, async (req, res, next) => {
   }
 });
 
+authRoute.post(`/signout`, async (req, res, next) => {
+  try {
+    return res.status(200).json({
+      message: `Signout successfully!`,
+      data: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+authRoute.post(`/me/update`, authMiddleware, async (req, res, next) => {
+  try {
+    const body = req.body;
+    const userId = req.user._id;
+    const user = await UserModel.findByIdAndUpdate(userId, body, { new: true });
+
+    return res.status(200).json({
+      message: `Update successfully!`,
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 export default authRoute;

@@ -8,30 +8,30 @@ import {
 } from "@/components/ui/card";
 
 import { Link } from "react-router-dom";
-import ForgotPasswordForm from "../form/ForgotPasswordForm";
+import OTPForm from "../../features/auth/components/OTPForm";
 
-const ForgotPasswordPage = () => {
+const OTPPage = () => {
   return (
     <div className="flex items-center justify-center h-full w-full sm:p-8">
       <Card className="sm:max-w-[440px] w-full">
         <CardHeader>
-          <CardTitle className="text-lg">Forgot Password</CardTitle>
+          <CardTitle className="text-lg">Two-factor Authentication</CardTitle>
           <CardDescription>
-            Enter your registered email and
+            Please enter the authentication code.
             <br />
-            we will send you a link to reset your password.
+            We have sent the authentication code to your email.
           </CardDescription>
         </CardHeader>
 
         <CardContent>
-          <ForgotPasswordForm />
+          <OTPForm />
         </CardContent>
 
         <CardFooter>
           <div className="text-muted-foreground text-center w-full">
-            Don't have an account?{" "}
+            Haven't received it?{" "}
             <Link to={`/auth/signup`} className="underline">
-              Sign Up.
+              Resend a new code.
             </Link>
           </div>
         </CardFooter>
@@ -40,4 +40,4 @@ const ForgotPasswordPage = () => {
   );
 };
 
-export default ForgotPasswordPage;
+export default OTPPage;

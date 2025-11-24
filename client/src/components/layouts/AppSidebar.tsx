@@ -15,15 +15,17 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { sidebarLinks } from "@/constants/links";
 
 import clsx from "clsx";
 import { ChevronRight, VenusAndMars } from "lucide-react";
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useAuthStore } from "@/features/_authen/data/store";
+import { sidebarLinks } from "./data/constant";
 
 export function AppSidebar() {
+  const { auth } = useAuthStore();
   return (
     <Sidebar className="p-2">
       <SidebarHeader className="bg-background ">
@@ -59,14 +61,14 @@ export function AppSidebar() {
       <SidebarFooter className="bg-background">
         <div className="flex items-center gap-2 px-2">
           <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>TTN</AvatarFallback>
+            <AvatarImage src={auth?.avatar || ""} alt="@shadcn" />
+            <AvatarFallback>
+              {auth?.name.split(" ").map((item) => item[0])}
+            </AvatarFallback>
           </Avatar>
           <div className="text-xs">
-            <p className="font-medium">satnaing</p>
-            <p className="text-muted-foreground font-normal">
-              satnaingdev@gmail.com
-            </p>
+            <p className="font-medium">{auth?.name}</p>
+            <p className="text-muted-foreground font-normal">{auth?.email}</p>
           </div>
         </div>
       </SidebarFooter>

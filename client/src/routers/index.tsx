@@ -9,12 +9,19 @@ import AuthRouter from "./(auth)";
 import { ComingSoon } from "@/components/layouts/ComingSoon";
 import ChatPage from "@/features/chats";
 import Layout from "@/components/layouts/Layout";
+import SigninPage from "@/features/_authen/pages/SigninPage";
+import SignupPage from "@/features/_authen/pages/SignupPage";
+import AuthProtected from "@/features/_authen/components/AuthProtected";
 
 const RouterTree = () => {
   const routers = useRoutes([
     {
       path: `/`,
-      element: <Layout />,
+      element: (
+        <AuthProtected>
+          <Layout />
+        </AuthProtected>
+      ),
       children: [
         {
           index: true,
@@ -53,6 +60,15 @@ const RouterTree = () => {
           element: <ComingSoon />,
         },
       ],
+    },
+    //
+    {
+      path: "/signin",
+      element: <SigninPage />,
+    },
+    {
+      path: "/signup",
+      element: <SignupPage />,
     },
   ]);
   return routers;

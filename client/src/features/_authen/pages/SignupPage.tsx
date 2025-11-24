@@ -8,26 +8,25 @@ import {
 } from "@/components/ui/card";
 
 import { Link } from "react-router-dom";
-import SigninForm from "../form/SigninForm";
-
-const SigninPage = () => {
+import SignupForm from "../components/SignupForm";
+const SignupPage = () => {
   return (
-    <div className="flex items-center justify-center h-full w-full sm:p-8">
+    <div className="flex items-center justify-center min-h-screen w-screen sm:p-8">
       <Card className="sm:max-w-[440px] w-full">
         <CardHeader>
-          <CardTitle className="text-lg">Sign in</CardTitle>
+          <CardTitle className="text-lg">Create an account</CardTitle>
           <CardDescription>
-            Enter your email and password below to log into your account.
+            Enter your email and password to create an account.
             <br />
-            You don&apos;t have an account?{" "}
-            <Link to={`/auth/signup`} className="underline">
-              Sign Up
+            Already have an account?{" "}
+            <Link to={`/signin`} className="underline">
+              Sign In
             </Link>
           </CardDescription>
         </CardHeader>
 
         <CardContent>
-          <SigninForm />
+          <SignupForm />
         </CardContent>
 
         <CardFooter className="flex flex-col gap-2">
@@ -42,15 +41,10 @@ const SigninPage = () => {
             </Link>
             .
           </div>
-          <div className="text-muted-foreground text-center">
-            <Link to={`/auth/forgot-password`} className="underline">
-              Forgot Password?
-            </Link>
-          </div>
         </CardFooter>
       </Card>
     </div>
   );
 };
 
-export default SigninPage;
+export default SignupPage;

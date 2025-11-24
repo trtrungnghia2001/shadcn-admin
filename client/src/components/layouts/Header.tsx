@@ -11,15 +11,16 @@ import {
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { NavLink } from "react-router-dom";
-import { sidebarLinks } from "@/constants/links";
 import clsx from "clsx";
 import { Button } from "../ui/button";
 import { Settings } from "lucide-react";
 import Search from "./Search";
+import { useAuthStore } from "@/features/_authen/data/store";
+import { sidebarLinks } from "./data/constant";
 
 const Header = () => {
   const navs = sidebarLinks[2].items[0].items;
-  console.log({ navs });
+  const { auth, signout } = useAuthStore();
 
   return (
     <header
@@ -43,27 +44,28 @@ const Header = () => {
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>TTN</AvatarFallback>
+              <AvatarImage src={auth?.avatar || ""} alt="@shadcn" />
+              <AvatarFallback>
+                {auth?.name.split(" ").map((item) => item[0])}
+              </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent className="w-40" align="end">
             <DropdownMenuLabel className="text-xs">
-              <p className="font-medium">satnaing</p>
-              <p className="text-muted-foreground font-normal">
-                satnaingdev@gmail.com
-              </p>
+              <p className="font-medium">{auth?.name}</p>
+              <p className="text-muted-foreground font-normal">{auth?.email}</p>
             </DropdownMenuLabel>
             <Separator />
-            <DropdownMenuGroup></DropdownMenuGroup>
-            {navs?.map((item) => (
-              <DropdownMenuItem key={item.path} asChild>
-                <NavLink to={item.path}>{item.label}</NavLink>
-              </DropdownMenuItem>
-            ))}
+            <DropdownMenuGroup>
+              {navs?.map((item) => (
+                <DropdownMenuItem key={item.path} asChild>
+                  <NavLink to={item.path}>{item.label}</NavLink>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
 
             <Separator />
-            <DropdownMenuItem>Sign out</DropdownMenuItem>
+            <DropdownMenuItem onClick={signout}>Sign out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

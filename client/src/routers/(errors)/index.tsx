@@ -1,8 +1,8 @@
-import ForbiddenPage from "@/features/errors/pages/ForbiddenPage";
-import InternalSeverErrorPage from "@/features/errors/pages/InternalSeverErrorPage";
-import MaintenanceErrorPage from "@/features/errors/pages/MaintenanceErrorPage";
-import NotFoundPage from "@/features/errors/pages/NotFoundPage";
-import UnauthorizedPage from "@/features/errors/pages/UnauthorizedPage";
+import ForbiddenPage from "@/routers/(errors)/ForbiddenPage";
+import InternalSeverErrorPage from "@/routers/(errors)/InternalSeverErrorPage";
+import MaintenanceErrorPage from "@/routers/(errors)/MaintenanceErrorPage";
+import NotFoundPage from "@/routers/(errors)/NotFoundPage";
+import UnauthorizedPage from "@/routers/(errors)/UnauthorizedPage";
 import { useRoutes } from "react-router-dom";
 
 const ErrorRouter = () => {

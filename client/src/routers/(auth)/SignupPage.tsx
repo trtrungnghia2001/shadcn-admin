@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 
 import { Link } from "react-router-dom";
-import SignupForm from "../form/SignupForm";
+import SignupForm from "../../features/auth/components/SignupForm";
 const SignupPage = () => {
   return (
     <div className="flex items-center justify-center h-full w-full sm:p-8">

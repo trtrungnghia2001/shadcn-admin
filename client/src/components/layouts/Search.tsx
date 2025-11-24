@@ -9,9 +9,9 @@ import {
 import { memo, useState } from "react";
 import { Button } from "../ui/button";
 import { ChevronRight, SearchIcon } from "lucide-react";
-import { sidebarLinks } from "@/constants/links";
 import { NavLink, useNavigate } from "react-router-dom";
 import clsx from "clsx";
+import { sidebarLinks } from "./data/constant";
 
 const Search = () => {
   const [open, setOpen] = useState(false);

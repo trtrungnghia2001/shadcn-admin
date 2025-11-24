@@ -8,24 +8,26 @@ import {
 } from "@/components/ui/card";
 
 import { Link } from "react-router-dom";
-import ResetPasswordForm from "../form/ResetPasswordForm";
+import ForgotPasswordForm from "../../features/auth/components/ForgotPasswordForm";
 
-const ResetPasswordPage = () => {
+const ForgotPasswordPage = () => {
   return (
     <div className="flex items-center justify-center h-full w-full sm:p-8">
       <Card className="sm:max-w-[440px] w-full">
         <CardHeader>
-          <CardTitle className="text-lg">Reset Password</CardTitle>
+          <CardTitle className="text-lg">Forgot Password</CardTitle>
           <CardDescription>
-            Create a new password for your account.
+            Enter your registered email and
+            <br />
+            we will send you a link to reset your password.
           </CardDescription>
         </CardHeader>
 
         <CardContent>
-          <ResetPasswordForm />
+          <ForgotPasswordForm />
         </CardContent>
 
-        <CardFooter className="flex flex-col gap-2">
+        <CardFooter>
           <div className="text-muted-foreground text-center w-full">
             Don't have an account?{" "}
             <Link to={`/auth/signup`} className="underline">
@@ -38,4 +40,4 @@ const ResetPasswordPage = () => {
   );
 };
 
-export default ResetPasswordPage;
+export default ForgotPasswordPage;

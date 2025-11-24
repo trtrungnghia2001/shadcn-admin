@@ -1,8 +1,8 @@
-import ForgotPasswordPage from "@/features/auth/pages/ForgotPasswordPage";
-import OTPPage from "@/features/auth/pages/OTPPage";
-import ResetPasswordPage from "@/features/auth/pages/ResetPasswordPage";
-import SigninPage from "@/features/auth/pages/SigninPage";
-import SignupPage from "@/features/auth/pages/SignupPage";
+import ForgotPasswordPage from "@/routers/(auth)/ForgotPasswordPage";
+import OTPPage from "@/routers/(auth)/OTPPage";
+import ResetPasswordPage from "@/routers/(auth)/ResetPasswordPage";
+import SigninPage from "@/routers/(auth)/SigninPage";
+import SignupPage from "@/routers/(auth)/SignupPage";
 import { useRoutes } from "react-router-dom";
 
 const AuthRouter = () => {

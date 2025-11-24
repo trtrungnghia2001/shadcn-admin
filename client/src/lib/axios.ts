@@ -25,7 +25,8 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    return Promise.reject(error);
+    const customError = error.response?.data ?? error;
+    return Promise.reject(customError);
 
     // const originalRequest = error.config as InternalAxiosRequestConfig & {
     //   _retry?: boolean;
