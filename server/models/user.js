@@ -11,6 +11,14 @@ const userSchema = new Schema(
       default: "member",
       enum: ["member", "admin"],
     },
+    dob: String,
+    language: String,
+    bio: String,
+    urls: [
+      {
+        url: String,
+      },
+    ],
   },
   { timestamps: true }
 );

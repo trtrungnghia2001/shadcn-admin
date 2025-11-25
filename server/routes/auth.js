@@ -93,6 +93,7 @@ authRoute.post(`/me/update`, authMiddleware, async (req, res, next) => {
   try {
     const body = req.body;
     const userId = req.user._id;
+
     const user = await UserModel.findByIdAndUpdate(userId, body, { new: true });
 
     return res.status(200).json({

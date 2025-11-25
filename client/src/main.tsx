@@ -5,6 +5,7 @@ import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "./features/theme/data/provider.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ChatProvider from "./features/chats/data/provider.tsx";
 
 const queryClient = new QueryClient();
 
@@ -13,7 +14,9 @@ createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
-          <App />
+          <ChatProvider>
+            <App />
+          </ChatProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </BrowserRouter>

@@ -1,9 +1,18 @@
+import { useAuthStore } from "@/features/_authen/data/store";
 import clsx from "clsx";
+import { memo, useMemo } from "react";
+import type { ChatMessageType } from "../data/type";
 
 interface ChatItemProps {
-  owner: boolean;
+  chatMessage: ChatMessageType;
 }
-const ChatItem = ({ owner }: ChatItemProps) => {
+const ChatMessage = ({ chatMessage }: ChatItemProps) => {
+  const { auth } = useAuthStore();
+
+  const owner = useMemo(() => {
+    return auth?._id === chatMessage.sender._id;
+  }, [chatMessage, auth]);
+
   return (
     <div className={clsx([`flex`, owner ? `justify-end` : `justify-start`])}>
       <div
@@ -14,18 +23,18 @@ const ChatItem = ({ owner }: ChatItemProps) => {
             : `bg-muted rounded-bl-none`,
         ])}
       >
-        <p>Yeah, let me know what you think.</p>
+        <p>{chatMessage.message}</p>
         <p
           className={clsx([
             `italic text-xs`,
             owner ? `text-primary-foreground/70` : `text-muted-foreground/70`,
           ])}
         >
-          9:25 AM
+          {new Date(chatMessage.createdAt).toLocaleString()}
         </p>
       </div>
     </div>
   );
 };
 
-export default ChatItem;
+export default memo(ChatMessage);

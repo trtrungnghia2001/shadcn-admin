@@ -101,8 +101,7 @@ export const sidebarLinks = [
         label: "Settings",
         path: "",
         items: [
-          { icon: User, path: "/settings/profile", label: "Profile" },
-          { icon: Settings, path: "/settings/account", label: "Account" },
+          { icon: User, path: "/settings/account", label: "Account" },
           { icon: Palette, path: "/settings/appearance", label: "Appearance" },
           { icon: Bell, path: "/settings/notification", label: "Notification" },
           { icon: Smartphone, path: "/settings/display", label: "Display" },

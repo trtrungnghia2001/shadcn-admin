@@ -15,7 +15,7 @@ const ThemeMenu = () => {
   const currentOption =
     themeOptions.find(
       (o) => o.value === (theme === "system" ? "system" : resolvedTheme)
-    ) ?? themeOptions[2];
+    ) ?? themeOptions[0];
 
   return (
     <DropdownMenu>

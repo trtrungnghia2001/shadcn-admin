@@ -1,7 +1,23 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useQuery } from "@tanstack/react-query";
 import { MessagesSquare, Search } from "lucide-react";
+import { getUsersApi } from "../data/api";
+import { useChatContext } from "../data/context";
+import { useEffect } from "react";
+import ChatUser from "./ChatUser";
 
 const ChatSidebar = () => {
+  const { setUsers, users } = useChatContext();
+  const { data } = useQuery({
+    queryKey: ["chat", "user"],
+    queryFn: async () => await getUsersApi(),
+  });
+
+  useEffect(() => {
+    if (data?.data) {
+      setUsers(data.data);
+    }
+  }, [data]);
+
   return (
     <div className="pr-4 w-64 h-full flex flex-col gap-4">
       {/*  */}
@@ -20,27 +36,11 @@ const ChatSidebar = () => {
       </div>
       {/*  */}
       <ul className="flex-1 overflow-y-auto">
-        {Array.from({ length: 20 })
-          .fill(0)
-          .map((_, idx) => (
-            <li key={idx} className="border-b last:border-none py-1">
-              <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted">
-                <Avatar className="">
-                  <AvatarImage
-                    src="https://github.com/shadcn.png"
-                    alt="@shadcn"
-                  />
-                  <AvatarFallback>TTN</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium">Alex John</p>
-                  <p className="text-muted-foreground line-clamp-1">
-                    You: See you late, Alex!
-                  </p>
-                </div>
-              </div>
-            </li>
-          ))}
+        {users.map((user, idx) => (
+          <li key={idx}>
+            <ChatUser user={user} />
+          </li>
+        ))}
       </ul>
     </div>
   );

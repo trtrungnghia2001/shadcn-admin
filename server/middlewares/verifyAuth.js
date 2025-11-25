@@ -5,6 +5,7 @@ import { ENV } from "../libs/env.js";
 export const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
+
     if (!token) {
       throw createHttpError.Unauthorized(
         "Access Token not found. Please log in."

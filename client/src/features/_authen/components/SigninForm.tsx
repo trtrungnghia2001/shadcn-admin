@@ -29,7 +29,11 @@ const SigninForm = () => {
     mutationFn: async (data: SigninDTO) => await signin(data),
     onSuccess: (data) => {
       toast.success(data.message);
-      navigate(location.state.pathname + location.state.search || "/");
+
+      const redirectUrl = location.state
+        ? location.state.pathname + location.state.search
+        : "/";
+      navigate(redirectUrl);
     },
     onError: (error) => toast.error(error.message),
   });

@@ -12,6 +12,7 @@ import Layout from "@/components/layouts/Layout";
 import SigninPage from "@/features/_authen/pages/SigninPage";
 import SignupPage from "@/features/_authen/pages/SignupPage";
 import AuthProtected from "@/features/_authen/components/AuthProtected";
+import SettingRouter from "./(settings)";
 
 const RouterTree = () => {
   const routers = useRoutes([
@@ -54,6 +55,10 @@ const RouterTree = () => {
         {
           path: "chats/*",
           element: <ChatPage />,
+        },
+        {
+          path: "settings/*",
+          element: <SettingRouter />,
         },
         {
           path: "*",

@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import ENV_CONFIG from "./env";
+import { useAuthStore } from "@/features/_authen/data/store";
 // import { refreshTokenApi } from "@/features/auth/apis/authApi";
 // import { useAuthStore } from "@/features/auth/stores/auth.store";
 
@@ -16,6 +17,8 @@ axiosInstance.interceptors.request.use(
     //   config.headers = config.headers || {};
     //   config.headers.Authorization = `Bearer ${token}`;
     // }
+
+    config.headers.Authorization = useAuthStore.getState().auth?.accessToken;
     return config;
   },
   (error) => Promise.reject(error)
@@ -26,6 +29,9 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const customError = error.response?.data ?? error;
+    if (error.status === 401) {
+      useAuthStore.getState().signout();
+    }
     return Promise.reject(customError);
 
     // const originalRequest = error.config as InternalAxiosRequestConfig & {

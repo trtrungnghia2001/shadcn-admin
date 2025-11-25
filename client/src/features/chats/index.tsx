@@ -1,25 +1,28 @@
-import ChatHeader from "./components/ChatHeader";
-import ChatInput from "./components/ChatInput";
-import ChatItem from "./components/ChatItem";
+import { MessagesSquare } from "lucide-react";
+import ChatContainer from "./components/ChatContainer";
 import ChatSidebar from "./components/ChatSidebar";
+import { useChatContext } from "./data/context";
 
 const ChatPage = () => {
   const header = document.getElementById("header")?.offsetHeight;
   console.log({ header });
+  const { currentUser } = useChatContext();
 
   return (
     <div className="flex items-stretch overflow-hidden h-[calc(100vh-100px)]">
       <ChatSidebar />
-      <div className="flex-1 flex flex-col justify-between border rounded-lg overflow-hidden">
-        <ChatHeader />
-        <div className="flex-1 p-4 overflow-y-auto space-y-4">
-          {Array(12)
-            .fill(0)
-            .map((_, idx) => (
-              <ChatItem owner={idx % 4 == 0} key={idx} />
-            ))}
-        </div>
-        <ChatInput />
+      <div className="flex-1 border rounded-lg overflow-hidden">
+        {currentUser ? (
+          <ChatContainer />
+        ) : (
+          <div className="flex flex-col gap-2 items-center justify-center h-full">
+            <MessagesSquare />
+            <h4>Your messages</h4>
+            <p className="text-muted-foreground">
+              Send a message to start a chat.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
