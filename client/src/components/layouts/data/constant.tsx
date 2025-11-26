@@ -17,8 +17,9 @@ import {
   Bell,
   Smartphone,
 } from "lucide-react";
+import type { SidebarGroup } from "./type";
 
-export const sidebarLinks = [
+export const sidebarLinks: SidebarGroup[] = [
   {
     label: "General",
     items: [

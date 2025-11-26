@@ -2,25 +2,17 @@ import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema(
   {
-    name: String,
-    avatar: String,
+    firstName: String,
+    lastName: String,
+    username: String,
     email: String,
-    password: String,
-    role: {
-      type: String,
-      default: "member",
-      enum: ["member", "admin"],
-    },
-    dob: String,
-    language: String,
-    bio: String,
-    urls: [
-      {
-        url: String,
-      },
-    ],
+    phoneNumber: String,
+    status: String,
+    role: String,
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 export const UserModel =

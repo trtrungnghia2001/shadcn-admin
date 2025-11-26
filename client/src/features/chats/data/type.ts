@@ -1,6 +1,7 @@
 import type { AuthType } from "@/features/_authen/data/store";
 
 export type ChatMessageType = {
+  _id: string;
   sender: AuthType;
   receiver: AuthType;
   message: string;
@@ -15,4 +16,5 @@ export type ChatMessageDTO = {
 
 export type ChatUserType = AuthType & {
   lastMessage: ChatMessageType;
+  isRead: boolean;
 };

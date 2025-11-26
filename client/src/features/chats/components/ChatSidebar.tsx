@@ -2,14 +2,20 @@ import { useQuery } from "@tanstack/react-query";
 import { MessagesSquare, Search } from "lucide-react";
 import { getUsersApi } from "../data/api";
 import { useChatContext } from "../data/context";
-import { useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import ChatUser from "./ChatUser";
+import { useDebounce } from "use-debounce";
 
 const ChatSidebar = () => {
   const { setUsers, users } = useChatContext();
+
+  const [search, setSearch] = useState("");
+
+  const [debouncedSearch] = useDebounce(search, 500);
+
   const { data } = useQuery({
-    queryKey: ["chat", "user"],
-    queryFn: async () => await getUsersApi(),
+    queryKey: ["chat", "users", debouncedSearch],
+    queryFn: async () => await getUsersApi(`search=${debouncedSearch}`),
   });
 
   useEffect(() => {
@@ -19,7 +25,7 @@ const ChatSidebar = () => {
   }, [data]);
 
   return (
-    <div className="pr-4 w-64 h-full flex flex-col gap-4">
+    <div className="sm:pr-4 sm:w-64 h-full flex flex-col gap-4 w-full">
       {/*  */}
       <div className="flex items-center gap-2">
         <h3>Inbox</h3>
@@ -32,6 +38,10 @@ const ChatSidebar = () => {
           type="text"
           placeholder="Search chat..."
           className="border-none outline-none w-full leading-0"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+          }}
         />
       </div>
       {/*  */}
@@ -46,4 +56,4 @@ const ChatSidebar = () => {
   );
 };
 
-export default ChatSidebar;
+export default memo(ChatSidebar);

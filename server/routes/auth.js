@@ -2,7 +2,7 @@ import express from "express";
 import createHttpError from "http-errors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { UserModel } from "../models/user.js";
+import { AccountModel } from "../models/account.js";
 import { signinSchema, signupSchema } from "../helpers/schema.js";
 import { ENV } from "../libs/env.js";
 import { authMiddleware } from "../middlewares/verifyAuth.js";
@@ -18,7 +18,7 @@ authRoute.post(`/signup`, async (req, res, next) => {
       throw createHttpError.BadRequest(error.message);
     }
 
-    const user = await UserModel.findOne({
+    const user = await AccountModel.findOne({
       email: body.email,
     });
 
@@ -29,7 +29,7 @@ authRoute.post(`/signup`, async (req, res, next) => {
     const salt = await bcrypt.genSalt(12);
     const hashPassword = await bcrypt.hash(body.password, salt);
 
-    await UserModel.create({ ...body, password: hashPassword });
+    await AccountModel.create({ ...body, password: hashPassword });
 
     return res.status(201).json({
       message: `Signup successfully!`,
@@ -48,7 +48,7 @@ authRoute.post(`/signin`, async (req, res, next) => {
       throw createHttpError.BadRequest(error.message);
     }
 
-    const user = await UserModel.findOne({
+    const user = await AccountModel.findOne({
       email: body.email,
     }).lean();
     if (!user) {
@@ -61,7 +61,7 @@ authRoute.post(`/signin`, async (req, res, next) => {
     }
 
     const accessToken = jwt.sign(
-      { _id: user._id, email: user.email },
+      { _id: user._id, email: user.email, role: user.role },
       ENV.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -94,7 +94,9 @@ authRoute.post(`/me/update`, authMiddleware, async (req, res, next) => {
     const body = req.body;
     const userId = req.user._id;
 
-    const user = await UserModel.findByIdAndUpdate(userId, body, { new: true });
+    const user = await AccountModel.findByIdAndUpdate(userId, body, {
+      new: true,
+    });
 
     return res.status(200).json({
       message: `Update successfully!`,

@@ -1,6 +1,10 @@
 export type ApiResponse<T> = {
   data: T;
   message: string;
-  success: boolean;
-  status: number;
+
+  page: number;
+  limit: number;
+  offset: number;
+  totalPages: number;
+  totals: number;
 };

@@ -191,7 +191,7 @@ const AppearanceForm = () => {
           )}
         />
 
-        <Button type="submit">Update Account</Button>
+        <Button type="submit">Update preferences</Button>
       </form>
     </Form>
   );

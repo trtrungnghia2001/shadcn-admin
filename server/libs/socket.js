@@ -19,20 +19,25 @@ export async function connectSocket() {
 
   io.on("connection", (socket) => {
     console.log(`Socket connected: `, socket.id);
+    const userId = socket.handshake.auth.userId;
+    if (!userId) return;
+
+    userMap.set(userId, socket.id);
+    io.emit("onlineUsers", Array.from(userMap.keys()));
+
     socket.on("disconnect", () => {
       console.log("Socket disconnected:", socket.id);
 
-      userMap.delete(socket.handshake.auth.userId);
-      socket.emit("onlineUsers", Array.from(userMap.keys()));
+      userMap.delete(userId);
+      io.emit("onlineUsers", Array.from(userMap.keys()));
     });
 
-    if (socket.handshake.auth.userId) {
-      userMap.set(socket.handshake.auth.userId, socket.id);
-      socket.emit("onlineUsers", Array.from(userMap.keys()));
-    }
+    socket.on("chat-writing", ({ receiverId, typing }) => {
+      const receiverSocket = userMap.get(receiverId);
+      console.log({ receiverSocket });
+      if (!receiverSocket) return;
 
-    console.log(`30::` + getSocketId(socket.handshake.auth.userId));
+      io.to(receiverSocket).emit("chat-writing", { userId, typing });
+    });
   });
 }
-
-// io.to().emit()

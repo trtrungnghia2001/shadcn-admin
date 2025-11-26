@@ -1,18 +1,25 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { EllipsisVertical, Phone, Video } from "lucide-react";
+import { ArrowLeft, EllipsisVertical, Phone, Video } from "lucide-react";
 import { useChatContext } from "../data/context";
 import { memo } from "react";
 import clsx from "clsx";
 
 const ChatHeader = () => {
-  const { currentUser, onlineUsers } = useChatContext();
-  console.log({ currentUser });
+  const { currentUser, onlineUsers, setCurrentUser } = useChatContext();
   const isOnline = onlineUsers.includes(currentUser?._id as string);
 
   return (
     <div className="p-4 flex items-center justify-between gap-8 shadow-lg">
       <div className="flex items-center gap-2">
+        <Button
+          onClick={() => setCurrentUser(null)}
+          size={"icon"}
+          variant={"ghost"}
+          className="sm:hidden"
+        >
+          <ArrowLeft />
+        </Button>
         <Avatar className="">
           <AvatarImage
             src={currentUser?.avatar || "https://github.com/shadcn.png"}

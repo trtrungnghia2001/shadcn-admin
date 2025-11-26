@@ -4,14 +4,14 @@ import ChatSidebar from "./components/ChatSidebar";
 import { useChatContext } from "./data/context";
 
 const ChatPage = () => {
-  const header = document.getElementById("header")?.offsetHeight;
-  console.log({ header });
+  // const header = document.getElementById("header")?.offsetHeight;
+  // console.log({ header });
   const { currentUser } = useChatContext();
 
   return (
     <div className="flex items-stretch overflow-hidden h-[calc(100vh-100px)]">
       <ChatSidebar />
-      <div className="flex-1 border rounded-lg overflow-hidden">
+      <div className="hidden sm:block flex-1 border rounded-lg overflow-hidden">
         {currentUser ? (
           <ChatContainer />
         ) : (
@@ -24,6 +24,11 @@ const ChatPage = () => {
           </div>
         )}
       </div>
+      {currentUser && (
+        <div className="sm:hidden absolute inset-0 bg-background">
+          <ChatContainer />
+        </div>
+      )}
     </div>
   );
 };

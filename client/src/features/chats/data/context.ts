@@ -5,11 +5,14 @@ import type { ChatMessageType, ChatUserType } from "./type";
 export type ChatConextType = {
   onlineUsers: string[];
   currentUser: AuthType | null;
+  setCurrentUser: (currentUser: AuthType | null) => void;
   messages: ChatMessageType[];
   setMessages: (message: ChatMessageType[]) => void;
-  setCurrentUser: (currentUser: AuthType | null) => void;
   users: ChatUserType[];
   setUsers: (users: ChatUserType[]) => void;
+  handleSelectCurrentUser: (currentUser: AuthType | null) => void;
+  currentUserSeen: string;
+  typingUser: boolean;
 };
 
 export const ChatConext = createContext<ChatConextType | null>(null);

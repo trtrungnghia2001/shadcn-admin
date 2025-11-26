@@ -1,6 +1,6 @@
 import express from "express";
 import { ChatModel } from "../models/chat.js";
-import { UserModel } from "../models/user.js";
+import { AccountModel } from "../models/account.js";
 import { getSocketId, io } from "../libs/socket.js";
 import mongoose from "mongoose";
 
@@ -35,14 +35,16 @@ chatRouter.post("/send", async (req, res, next) => {
 chatRouter.get("/users", async (req, res, next) => {
   try {
     const userId = req.user._id;
+    const search = req.query.search || "";
 
-    const data = await UserModel.aggregate([
-      // Bỏ user hiện tại
+    const data = await AccountModel.aggregate([
       {
-        $match: { _id: { $ne: new mongoose.Types.ObjectId(userId) } },
+        $match: {
+          _id: { $ne: new mongoose.Types.ObjectId(userId) },
+          name: { $regex: search, $options: "i" },
+        },
       },
 
-      // Tìm lastMessage
       {
         $lookup: {
           from: "chats",
@@ -78,10 +80,9 @@ chatRouter.get("/users", async (req, res, next) => {
             { $sort: { createdAt: -1 } },
             { $limit: 1 },
 
-            // populate sender
             {
               $lookup: {
-                from: "users",
+                from: "accounts",
                 localField: "sender",
                 foreignField: "_id",
                 as: "sender",
@@ -89,10 +90,9 @@ chatRouter.get("/users", async (req, res, next) => {
             },
             { $unwind: { path: "$sender", preserveNullAndEmptyArrays: true } },
 
-            // populate receiver
             {
               $lookup: {
-                from: "users",
+                from: "accounts",
                 localField: "receiver",
                 foreignField: "_id",
                 as: "receiver",
@@ -105,11 +105,26 @@ chatRouter.get("/users", async (req, res, next) => {
           as: "lastMessage",
         },
       },
-
-      // Lấy phần tử đầu tiên
       {
         $addFields: {
           lastMessage: { $arrayElemAt: ["$lastMessage", 0] },
+        },
+      },
+
+      {
+        $addFields: {
+          isRead: {
+            $cond: [
+              {
+                $in: [
+                  new mongoose.Types.ObjectId(userId),
+                  { $ifNull: ["$lastMessage.readBy", []] },
+                ],
+              },
+              true,
+              false,
+            ],
+          },
         },
       },
     ]);
@@ -125,6 +140,11 @@ chatRouter.get("/users", async (req, res, next) => {
 
 chatRouter.get("/users/message/:id", async (req, res, next) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = parseInt(req.query.offset) || 0;
+    const skip = (page - 1) * limit + offset;
+
     const { id } = req.params;
     const userId = req.user._id;
 
@@ -149,13 +169,28 @@ chatRouter.get("/users/message/:id", async (req, res, next) => {
       .populate([`sender`, `receiver`])
       .sort({
         createdAt: -1,
-      });
+      })
+      .limit(limit)
+      .skip(skip);
 
-    io.to(getSocketId(userId)).emit("chat-click-read", userId);
+    const totals = await ChatModel.countDocuments({
+      $or: [
+        { sender: userId, receiver: id },
+        { receiver: userId, sender: id },
+      ],
+    });
+    const totalPages = Math.ceil(totals / limit);
+
+    io.to(getSocketId(userId)).emit("chat-clickRead", id);
 
     return res.status(200).json({
       message: `Fetch successfully!`,
       data: data,
+      page,
+      limit,
+      offset,
+      totalPages,
+      totals,
     });
   } catch (error) {
     next(error);

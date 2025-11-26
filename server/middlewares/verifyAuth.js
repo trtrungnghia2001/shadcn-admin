@@ -12,11 +12,25 @@ export const authMiddleware = async (req, res, next) => {
       );
     }
 
-    const decoded = await jwt.verify(token, ENV.JWT_SECRET);
+    const decoded = jwt.verify(token, ENV.JWT_SECRET);
 
     req.user = decoded;
     next();
   } catch (error) {
+    // Token hết hạn
+    if (error.name === "TokenExpiredError") {
+      return next(
+        createHttpError.Unauthorized("Token expired. Please log in again.")
+      );
+    }
+
+    // Token không hợp lệ
+    if (error.name === "JsonWebTokenError") {
+      return next(
+        createHttpError.Unauthorized("Invalid token. Please log in again.")
+      );
+    }
+
     next(error);
   }
 };

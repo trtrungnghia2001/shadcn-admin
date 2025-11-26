@@ -29,6 +29,7 @@ export const settingTabs = [
     description: `Turn items on or off to control what's displayed in the app.`,
   },
 ];
+
 export const languages = [
   { label: "Vietnam", value: "vn" },
   { label: "English", value: "en" },
@@ -41,7 +42,9 @@ export const languages = [
   { label: "Korean", value: "ko" },
   { label: "Chinese", value: "zh" },
 ];
+
 export const fonts = [`Inter`, `Open Sans`, `Roboto`, `System`];
+
 export const themes = [
   {
     bgColor: `bg-[#ecedef]`,
@@ -55,4 +58,55 @@ export const themes = [
     itemColor: `bg-slate-400`,
     value: `dark`,
   },
+];
+
+export const notify_abouts = [
+  {
+    label: "All new messages",
+    value: "all",
+  },
+  {
+    label: "Direct messages and mentions",
+    value: "mentions",
+  },
+  {
+    label: "Nothing",
+    value: "none",
+  },
+];
+
+export const notify_emails = [
+  {
+    label: "Communication emails",
+    description: `Receive emails about your account activity.`,
+    value: true,
+    name: "communication_emails",
+  },
+  {
+    label: "Marketing emails",
+    description: `Receive emails about new products, features, and more.`,
+    value: false,
+    name: "marketing_emails",
+  },
+  {
+    label: "Social emails",
+    description: `Receive emails for friend requests, follows, and more.`,
+    value: false,
+    name: "social_emails",
+  },
+  {
+    label: "Security emails",
+    description: `Receive emails about your account activity and security.`,
+    value: false,
+    name: "security_emails",
+  },
+];
+
+export const displaies = [
+  "Recents",
+  "Home",
+  "Applications",
+  "Desktop",
+  "Download",
+  "Documents",
 ];

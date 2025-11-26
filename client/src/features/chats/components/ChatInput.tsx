@@ -5,6 +5,7 @@ import { memo, useState } from "react";
 import { getSendApi } from "../data/api";
 import { useChatContext } from "../data/context";
 import { toast } from "sonner";
+import { socket } from "@/lib/socket";
 
 const ChatInput = () => {
   const { currentUser, setMessages, messages, users, setUsers } =
@@ -23,6 +24,7 @@ const ChatInput = () => {
           ? {
               ...u,
               lastMessage: data.data,
+              isRead: true,
             }
           : u
       );
@@ -60,7 +62,21 @@ const ChatInput = () => {
           placeholder="Type yuor messages..."
           className="w-full border-none outline-none"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => {
+            setMessage(e.target.value);
+          }}
+          onFocus={() => {
+            socket.emit("chat-writing", {
+              receiverId: currentUser?._id,
+              typing: true,
+            });
+          }}
+          onBlur={() => {
+            socket.emit("chat-writing", {
+              receiverId: currentUser?._id,
+              typing: false,
+            });
+          }}
         />
         <Button
           type="submit"

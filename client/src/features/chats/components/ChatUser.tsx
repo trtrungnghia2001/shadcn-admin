@@ -11,7 +11,8 @@ interface ChatUserProps {
 
 const ChatUser = ({ user }: ChatUserProps) => {
   const { auth } = useAuthStore();
-  const { onlineUsers, setCurrentUser } = useChatContext();
+  const { onlineUsers, handleSelectCurrentUser, currentUser } =
+    useChatContext();
 
   const lastMessageText = useMemo(() => {
     if (!user.lastMessage) return `No messages yet`;
@@ -24,15 +25,12 @@ const ChatUser = ({ user }: ChatUserProps) => {
     return name + ": " + user.lastMessage.message;
   }, [user, auth]);
 
-  const isRead = useMemo(() => {
-    if (!auth || !user) return false;
-
-    return user.lastMessage?.readBy?.includes(auth._id);
-  }, [user, auth]);
-
   return (
     <div
-      onClick={() => setCurrentUser(user)}
+      onClick={() => {
+        if (user._id === currentUser?._id) return;
+        handleSelectCurrentUser(user);
+      }}
       className="border-b last:border-none py-1 cursor-pointer"
     >
       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted">
@@ -53,7 +51,7 @@ const ChatUser = ({ user }: ChatUserProps) => {
           <p
             className={clsx([
               `line-clamp-1 text-xs`,
-              isRead || !user.lastMessage
+              user.isRead || !user.lastMessage
                 ? `text-muted-foreground`
                 : `font-medium`,
             ])}

@@ -1,29 +1,40 @@
 import { socket } from "@/lib/socket";
 import React, { useEffect, useState } from "react";
 import { ChatConext } from "./context";
-import type { AuthType } from "@/features/_authen/data/store";
+import { useAuthStore, type AuthType } from "@/features/_authen/data/store";
 import type { ChatMessageType, ChatUserType } from "./type";
 
 const ChatProvider = ({ children }: { children: React.ReactNode }) => {
+  const { auth } = useAuthStore();
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [currentUser, setCurrentUser] = useState<AuthType | null>(null);
+  const [currentUserSeen, setCurrentUserSeen] = useState<string>("");
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [users, setUsers] = useState<ChatUserType[]>([]);
+  const [typingUser, setTypingUser] = useState<boolean>(false);
 
   useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Connected to server with ID:", socket.id);
-    });
+    if (!auth) {
+      socket.disconnect();
+      return;
+    }
 
-    socket.on("onlineUsers", (value) => {
-      setOnlineUsers(value);
-    });
-
-    //
-    return () => {
-      socket.off("connect");
+    socket.auth = {
+      userId: auth?._id,
     };
-  }, []);
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    const handleOnline = (value: string[]) => {
+      setOnlineUsers(value);
+    };
+    socket.on("onlineUsers", handleOnline);
+
+    return () => {
+      socket.off("onlineUsers", handleOnline);
+    };
+  }, [auth]);
 
   useEffect(() => {
     const handleSend = (value: ChatMessageType) => {
@@ -31,11 +42,13 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         setMessages((prev) => [...prev, value]);
       }
 
+      // update lastMessage ui
       const newUsers = users.map((u) =>
         u._id === value.sender?._id
           ? {
               ...u,
               lastMessage: value,
+              isRead: false,
             }
           : u
       );
@@ -44,29 +57,41 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     };
     socket.on("chat-send", handleSend);
 
-    const handleClick = (value: string) => {
+    // update ui user read mess
+    const handleClickRead = (senderId: string) => {
       setUsers((prev) =>
         prev.map((u) =>
-          u?.lastMessage?.receiver?._id === value
+          u?._id === senderId
             ? {
                 ...u,
-                lastMessage: {
-                  ...u.lastMessage,
-                  readBy: [...u.lastMessage.readBy, value],
-                },
+                isRead: true,
               }
             : u
         )
       );
     };
-    socket.on("chat-click-read", handleClick);
+    socket.on("chat-clickRead", handleClickRead);
+
+    const handleWriting = (data: { userId: string; typing: boolean }) => {
+      if (currentUser?._id === data.userId) {
+        setTypingUser(data.typing);
+      }
+    };
+    socket.on("chat-writing", handleWriting);
 
     //
     return () => {
       socket.off("chat-send", handleSend);
-      socket.off("chat-click-read", handleClick);
+      socket.off("chat-clickRead", handleClickRead);
+      socket.off("chat-writing", handleWriting);
     };
   }, [currentUser, users]);
+
+  const handleSelectCurrentUser = (user: AuthType | null) => {
+    setCurrentUser(user);
+    setMessages([]);
+    setCurrentUserSeen("");
+  };
 
   return (
     <ChatConext.Provider
@@ -75,9 +100,12 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         messages,
         setMessages,
         currentUser,
-        setCurrentUser,
         users,
         setUsers,
+        handleSelectCurrentUser,
+        currentUserSeen,
+        typingUser,
+        setCurrentUser,
       }}
     >
       {children}

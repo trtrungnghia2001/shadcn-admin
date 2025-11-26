@@ -4,17 +4,17 @@ const chatSchema = new mongoose.Schema(
   {
     sender: {
       type: Schema.Types.ObjectId,
-      ref: "user",
+      ref: "account",
     },
     receiver: {
       type: Schema.Types.ObjectId,
-      ref: "user",
+      ref: "account",
     },
     message: String,
     readBy: [
       {
         type: Schema.Types.ObjectId,
-        ref: "user",
+        ref: "account",
       },
     ],
   },

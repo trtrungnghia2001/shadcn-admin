@@ -24,3 +24,18 @@ export const formAppearanceSchema = z.object({
   theme: z.string(),
 });
 export type AppearanceDTO = z.infer<typeof formAppearanceSchema>;
+
+export const formNotificationSchema = z.object({
+  type: z.string(),
+  mobile: z.boolean(),
+  communication_emails: z.boolean(),
+  social_emails: z.boolean(),
+  marketing_emails: z.boolean(),
+  security_emails: z.boolean(),
+});
+export type NotificationDTO = z.infer<typeof formNotificationSchema>;
+
+export const formDisplaySchema = z.object({
+  items: z.array(z.string()),
+});
+export type DisplayDTO = z.infer<typeof formDisplaySchema>;

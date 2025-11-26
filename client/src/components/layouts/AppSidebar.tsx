@@ -23,9 +23,9 @@ import { NavLink, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useAuthStore } from "@/features/_authen/data/store";
 import { sidebarLinks } from "./data/constant";
-
 export function AppSidebar() {
   const { auth } = useAuthStore();
+
   return (
     <Sidebar className="p-2">
       <SidebarHeader className="bg-background ">
