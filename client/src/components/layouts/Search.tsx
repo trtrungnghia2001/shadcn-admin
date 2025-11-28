@@ -49,7 +49,7 @@ const Search = () => {
                         navigate(subItem.path);
                       }}
                     >
-                      <item.icon />
+                      {item.icon && <item.icon />}
                       {item.label}
                       <ChevronRight />
                       {subItem.label}
@@ -65,7 +65,7 @@ const Search = () => {
                       navigate(item.path);
                     }}
                   >
-                    <item.icon />
+                    {item.icon && <item.icon />}
                     {item.label}
                   </CommandItem>
                 );

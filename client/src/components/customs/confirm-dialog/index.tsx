@@ -9,12 +9,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import type { AlertDialogProps } from "@radix-ui/react-alert-dialog";
-import { memo, useCallback } from "react";
+import type { AxiosError } from "axios";
+import { Loader } from "lucide-react";
+import { memo, useCallback, useState } from "react";
+import { toast } from "sonner";
 
 interface ConfirmDialogProps extends AlertDialogProps {
   title?: string;
   description?: string;
-  handleConfirm: () => void;
+  handleConfirm: () => Promise<void>;
   confirmText?: string;
   confirmVariant?: "destructive" | "default" | "outline";
 }
@@ -28,10 +31,22 @@ const ConfirmDialog = ({
   onOpenChange,
   ...props
 }: ConfirmDialogProps) => {
-  const onConfirm = useCallback(() => {
-    handleConfirm();
-    onOpenChange?.(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onConfirm = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      await handleConfirm();
+      toast.success(`Deleted successfully!`);
+    } catch (error) {
+      toast.error((error as AxiosError).message);
+    } finally {
+      setIsLoading(false);
+      onOpenChange?.(false);
+    }
   }, [handleConfirm, onOpenChange]);
+
   const onCancel = useCallback(() => {
     onOpenChange?.(false);
   }, [onOpenChange]);
@@ -46,6 +61,7 @@ const ConfirmDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
           <Button onClick={onConfirm} variant={confirmVariant}>
+            {isLoading && <Loader className="animate-spin" />}
             {confirmText}
           </Button>
         </AlertDialogFooter>

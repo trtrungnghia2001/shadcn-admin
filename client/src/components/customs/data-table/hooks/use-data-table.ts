@@ -13,17 +13,21 @@ import {
 } from "@tanstack/react-table";
 import React from "react";
 
-export function useDataTable<TData>({
-  data,
-  columns,
-  initialState = {},
-  options,
-}: {
+interface DataTableProps<TData> {
   data: TData[];
+  mode?: "client" | "server";
   columns: ColumnDef<TData>[];
   initialState?: Partial<TableState>;
   options?: Omit<TableOptions<TData>, "data" | "columns" | "state">;
-}) {
+}
+
+export function useDataTable<TData>({
+  data,
+  mode = "client",
+  columns,
+  initialState = {},
+  options,
+}: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>(
     initialState.sorting ?? []
   );
@@ -55,9 +59,10 @@ export function useDataTable<TData>({
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+
+    getFilteredRowModel: mode === "client" ? getFilteredRowModel() : undefined,
     ...options,
   });
 

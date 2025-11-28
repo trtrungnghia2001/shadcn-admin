@@ -34,3 +34,18 @@ export const authMiddleware = async (req, res, next) => {
     next(error);
   }
 };
+export const adminMiddleware = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return next(createHttpError.Unauthorized("User not authenticated."));
+    }
+
+    if (req.user.role !== "admin") {
+      return next(createHttpError.Forbidden("Access denied. Admins only."));
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};

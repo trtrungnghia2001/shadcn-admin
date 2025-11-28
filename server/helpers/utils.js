@@ -12,10 +12,29 @@ export async function parseExcelToArray(file) {
   return XLSX.utils.sheet_to_json(sheet, { defval: "" });
 }
 
-export function exportArrayToExcel(data = []) {
+export function exportArrayToExcel(res, data = [], filename = "data.xlsx") {
   const worksheet = XLSX.utils.json_to_sheet(data);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-  return XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+  // 2️⃣ Viết workbook ra ArrayBuffer
+  const arrayBuffer = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
+
+  // 3️⃣ Chuyển sang Node Buffer
+  const buffer = Buffer.from(arrayBuffer);
+
+  // 4️⃣ Set headers để client download file
+  res.setHeader(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+  // ✨ Tắt cache để tránh 304 Not Modified
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+
+  // 5️⃣ Gửi buffer về client
+  res.send(buffer);
 }

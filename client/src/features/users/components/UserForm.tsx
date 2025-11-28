@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Input } from "@/components/ui/input";
 
 import {
@@ -21,18 +20,7 @@ import {
 import { roles, statuses } from "../data/constants";
 import { useEffect } from "react";
 import { useUserStore } from "../data/store";
-
-const formSchema = z.object({
-  firstName: z.string().min(1, "Please enter your name"),
-  lastName: z.string().min(1, "Please enter your name"),
-  username: z.string().min(1, "Please enter your name"),
-  email: z.email({
-    error: (iss) => (iss.input === "" ? "Please enter your email" : undefined),
-  }),
-  phoneNumber: z.string().min(1, "Please enter your name"),
-  status: z.string().min(1, "Please enter your name"),
-  role: z.string().min(1, "Please enter your name"),
-});
+import { formUserSchema, type UserDTO } from "../data/schema";
 
 const defaultValues = {
   firstName: "",
@@ -44,19 +32,17 @@ const defaultValues = {
   status: "",
 };
 
-const UserForm = () => {
+const UserForm = ({ mutate }: { mutate: (data: UserDTO) => void }) => {
   const { currentData, open } = useUserStore();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<UserDTO>({
+    resolver: zodResolver(formUserSchema),
     defaultValues: defaultValues,
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  function onSubmit(values: UserDTO) {
+    mutate(values);
   }
 
   useEffect(() => {

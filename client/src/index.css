@@ -144,8 +144,45 @@
   }
 }
 @theme {
-  /* --font- */
 }
 
 @layer components {
+  /* Custom Scrollbar (auto dark/light) */
+  .scrollbar-beauty {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(140, 140, 160, 0.6) transparent;
+  }
+
+  /* Webkit browsers */
+  .scrollbar-beauty::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-beauty::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-beauty::-webkit-scrollbar-thumb {
+    background: rgba(140, 140, 160, 0.6);
+    border-radius: 9999px;
+    transition: background 0.2s ease;
+  }
+
+  .scrollbar-beauty::-webkit-scrollbar-thumb:hover {
+    background: rgba(140, 140, 160, 0.8);
+  }
+
+  /* Dark mode */
+  .dark .scrollbar-beauty {
+    scrollbar-color: rgba(200, 200, 220, 0.4) transparent;
+  }
+
+  .dark .scrollbar-beauty::-webkit-scrollbar-thumb {
+    background: rgba(200, 200, 220, 0.4);
+  }
+
+  .dark .scrollbar-beauty::-webkit-scrollbar-thumb:hover {
+    background: rgba(200, 200, 220, 0.6);
+  }
 }

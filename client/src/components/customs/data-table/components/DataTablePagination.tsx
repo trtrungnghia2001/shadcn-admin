@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/select";
 import Pagination, { type PaginationProps } from "../../pagination";
 import type { Table } from "@tanstack/react-table";
+import { useEffect } from "react";
 
 export interface DataTablePaginationProps<TData> {
   table: Table<TData>;
@@ -26,6 +27,10 @@ export function DataTablePagination<TData>({
 
   const totalPages = pagination?.totalPages ?? table.getPageCount();
   const pageSize = rowsPerPage ?? table.getState().pagination.pageSize;
+
+  useEffect(() => {
+    table.setPageSize(pageSize);
+  }, [pageSize]);
 
   return (
     <div className="flex flex-col md:flex-row gap-6 items-center justify-between lg:space-x-8">

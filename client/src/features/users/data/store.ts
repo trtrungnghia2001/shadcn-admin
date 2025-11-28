@@ -2,10 +2,9 @@ import { create } from "zustand";
 import type { User, UserStoreType } from "./type";
 import axiosInstance from "@/lib/axios";
 import type { ApiResponse } from "@/lib/type";
-import { usersData } from "./data";
 
 export const useUserStore = create<UserStoreType<User>>()((set, get) => ({
-  data: usersData,
+  data: [],
   create: async (user) => {
     const resp = (await axiosInstance.post<ApiResponse<User>>("/users", user))
       .data;
@@ -20,7 +19,7 @@ export const useUserStore = create<UserStoreType<User>>()((set, get) => ({
     ).data;
     set({
       data: get().data.map((item) =>
-        item.id === id ? { ...item, ...resp.data } : item
+        item._id === id ? { ...item, ...resp.data } : item
       ),
     });
     return resp;
@@ -29,12 +28,21 @@ export const useUserStore = create<UserStoreType<User>>()((set, get) => ({
     const resp = (await axiosInstance.delete<ApiResponse<User>>("/users/" + id))
       .data;
     set({
-      data: get().data.filter((item) => item.id !== id),
+      data: get().data.filter((item) => item._id !== id),
     });
     return resp;
   },
-  fetchAll: async () => {
-    const resp = (await axiosInstance.get<ApiResponse<User[]>>("/users?")).data;
+  removeIds: async (ids) => {
+    const resp = (
+      await axiosInstance.delete<ApiResponse<User>>("/users", { data: { ids } })
+    ).data;
+
+    return resp;
+  },
+  fetchAll: async (query = "") => {
+    const resp = (
+      await axiosInstance.get<ApiResponse<User[]>>("/users?" + query)
+    ).data;
     set({
       data: resp.data,
     });
@@ -44,6 +52,29 @@ export const useUserStore = create<UserStoreType<User>>()((set, get) => ({
     const resp = (await axiosInstance.get<ApiResponse<User>>("/users/" + id))
       .data;
     return resp;
+  },
+  importExcel: async (file) => {
+    const fromData = new FormData();
+    fromData.append("file", file);
+    const resp = (
+      await axiosInstance.post<ApiResponse<User[]>>("/users/import", fromData)
+    ).data;
+    return resp;
+  },
+  exportExcel: async () => {
+    const resp = await axiosInstance.get("/users/export", {
+      responseType: "blob",
+    });
+    const url = window.URL.createObjectURL(resp.data);
+
+    // Tạo link tạm để trigger download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "users.xlsx";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
   },
 
   // dialog

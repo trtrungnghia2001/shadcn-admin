@@ -92,7 +92,7 @@ const ChatContainer = () => {
 
       <div
         ref={scrollContainerRef}
-        className="flex-1 p-4 overflow-y-auto space-y-4"
+        className="flex-1 p-4 overflow-y-auto space-y-4 scrollbar-beauty"
       >
         <div ref={loadMoreRef}></div>
         {isFetchingNextPage && (

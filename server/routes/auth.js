@@ -6,6 +6,15 @@ import { AccountModel } from "../models/account.js";
 import { signinSchema, signupSchema } from "../helpers/schema.js";
 import { ENV } from "../libs/env.js";
 import { authMiddleware } from "../middlewares/verifyAuth.js";
+import { rateLimit } from "express-rate-limit";
+
+const loginLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 10,
+  message: {
+    message: "Too many login attempts, please try again in 1 minute.",
+  },
+});
 
 const authRoute = express.Router();
 
@@ -39,7 +48,7 @@ authRoute.post(`/signup`, async (req, res, next) => {
   }
 });
 
-authRoute.post(`/signin`, async (req, res, next) => {
+authRoute.post(`/signin`, loginLimiter, async (req, res, next) => {
   try {
     const body = req.body;
 

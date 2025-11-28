@@ -1,6 +1,12 @@
 import * as XLSX from "xlsx";
 
-export function exportToXLSX(filename: string, rows: unknown[]) {
+export function exportToXLSX({
+  rows,
+  fileName = "data.xlsx",
+}: {
+  rows: unknown[];
+  fileName?: string;
+}) {
   if (!rows?.length) return;
 
   const worksheet = XLSX.utils.json_to_sheet(rows);
@@ -8,7 +14,7 @@ export function exportToXLSX(filename: string, rows: unknown[]) {
 
   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-  XLSX.writeFile(workbook, filename);
+  XLSX.writeFile(workbook, fileName);
 }
 
 export function importXLSX(file: File): Promise<unknown[]> {

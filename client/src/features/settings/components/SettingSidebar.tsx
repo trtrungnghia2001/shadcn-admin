@@ -11,7 +11,7 @@ const SettingSidebar = () => {
           key={item.path}
           className={({ isActive }) =>
             clsx([
-              `flex items-center gap-2 px-2 py-2 rounded-lg`,
+              `flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-accent`,
               isActive && `font-medium bg-accent`,
             ])
           }

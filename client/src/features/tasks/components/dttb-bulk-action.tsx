@@ -54,7 +54,7 @@ export function DttbBulkActions({ table }: DttbBulkActionsProps) {
             const rows = table
               .getFilteredSelectedRowModel()
               .rows.map((r) => r.original);
-            exportToXLSX(`selected.xlsx`, rows);
+            exportToXLSX({ rows: rows });
           },
         },
         {

@@ -22,7 +22,7 @@ const ChatHeader = () => {
         </Button>
         <Avatar className="">
           <AvatarImage
-            src={currentUser?.avatar || "https://github.com/shadcn.png"}
+            src={currentUser?.avatar || ""}
             alt={currentUser?.name}
           />
           <AvatarFallback>{currentUser?.name}</AvatarFallback>

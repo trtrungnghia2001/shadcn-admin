@@ -6,7 +6,7 @@ import { useLayoutStore } from "./data/store";
 
 export default function Layout() {
   const { open, setOpen } = useLayoutStore();
-  console.log({ open });
+  // console.log({ open });
 
   return (
     <SidebarProvider open={open} onOpenChange={setOpen}>

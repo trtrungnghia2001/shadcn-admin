@@ -2,11 +2,6 @@ import { DataTableColumnHeader } from "@/components/customs/data-table/component
 import { Checkbox } from "@/components/ui/checkbox";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { User } from "../data/type";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { roles, statuses } from "../data/constants";
 import { DataTableRowActions } from "./dttb-row-actions";
@@ -42,23 +37,16 @@ export const DataTableColumn: ColumnDef<User>[] = [
     ),
   },
   {
-    accessorKey: "name",
+    accessorKey: "lastName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      <DataTableColumnHeader column={column} title="Last Name" />
     ),
-    cell: ({ row }) => {
-      const { firstName, lastName } = row.original;
-      const name = `${firstName} ${lastName}`;
-
-      return (
-        <Tooltip>
-          <TooltipTrigger>{name}</TooltipTrigger>
-          <TooltipContent>
-            <p>{name}</p>
-          </TooltipContent>
-        </Tooltip>
-      );
-    },
+  },
+  {
+    accessorKey: "firstName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="First Name" />
+    ),
   },
   {
     accessorKey: "email",

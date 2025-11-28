@@ -19,7 +19,7 @@ import {
 import clsx from "clsx";
 import { ChevronRight, VenusAndMars } from "lucide-react";
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useAuthStore } from "@/features/_authen/data/store";
 import { sidebarLinks } from "./data/constant";
@@ -27,19 +27,21 @@ export function AppSidebar() {
   const { auth } = useAuthStore();
 
   return (
-    <Sidebar className="p-2">
+    <Sidebar className="p-2 ">
       <SidebarHeader className="bg-background ">
-        <div className="flex items-center gap-2 p-2">
-          <div className="bg-sidebar-primary text-sidebar-primary-foreground size-8 rounded-md flex items-center justify-center">
-            <VenusAndMars size={16} />
+        <Link to={`/`}>
+          <div className="flex items-center gap-2 p-2">
+            <div className="bg-sidebar-primary text-sidebar-primary-foreground size-8 rounded-md flex items-center justify-center">
+              <VenusAndMars size={16} />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="font-semibold text-sm">Shadcn Admin</p>
+              <p className="text-xs">Vite + ShadcnUI</p>
+            </div>
           </div>
-          <div className="flex-1 text-left">
-            <p className="font-semibold text-sm">Shadcn Admin</p>
-            <p className="text-xs">Vite + ShadcnUI</p>
-          </div>
-        </div>
+        </Link>
       </SidebarHeader>
-      <SidebarContent className="bg-background">
+      <SidebarContent className="bg-background scrollbar-beauty">
         {sidebarLinks.map(({ items, label }, idx) => (
           <SidebarGroup key={idx}>
             <SidebarGroupLabel>{label}</SidebarGroupLabel>

@@ -89,7 +89,7 @@ const TasksPage = () => {
         }}
         confirmText="Delete"
         confirmVariant="destructive"
-        handleConfirm={() => {
+        handleConfirm={async () => {
           if (open === "delete" && currentData) {
             handleDeleteTask(currentData);
           } else if (open === "deleteSelect") {

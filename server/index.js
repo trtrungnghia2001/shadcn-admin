@@ -1,18 +1,22 @@
-import express from "express";
 import authRoute from "./routes/auth.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import http from "http";
+import express from "express";
 import { connectDB } from "./libs/mongodb.js";
 import { ENV } from "./libs/env.js";
 import chatRouter from "./routes/chat.js";
 import { authMiddleware } from "./middlewares/verifyAuth.js";
 import { connectSocket } from "./libs/socket.js";
-
-await connectDB();
-await connectSocket();
+import userRoute from "./routes/user.js";
 
 const app = express();
+const server = http.createServer(app);
+
+await connectDB();
+
+await connectSocket(server);
 
 app.use(
   cors({
@@ -23,16 +27,12 @@ app.use(
 app.use(cookieParser());
 app.use(bodyParser.json({ limit: "50mb" }));
 
-const PORT = ENV.PORT || 5000;
-
 app.use(`/auth`, authRoute);
 app.use(`/chat`, authMiddleware, chatRouter);
+app.use(`/users`, authMiddleware, userRoute);
 
 app.get(`/`, (req, res) => {
   res.status(200).json(`Hello server`);
-});
-app.listen(PORT, () => {
-  console.log(`Server running is port:: `, PORT);
 });
 
 app.use((err, req, res, next) => {
@@ -45,4 +45,7 @@ app.use((err, req, res, next) => {
     status: status,
     message: message,
   });
+});
+server.listen(ENV.PORT, () => {
+  console.log(`Socket running is port:: `, ENV.PORT);
 });

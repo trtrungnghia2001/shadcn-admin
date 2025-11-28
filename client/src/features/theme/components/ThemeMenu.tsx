@@ -11,11 +11,9 @@ import type { Theme } from "../data/type";
 import { Check } from "lucide-react";
 
 const ThemeMenu = () => {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const currentOption =
-    themeOptions.find(
-      (o) => o.value === (theme === "system" ? "system" : resolvedTheme)
-    ) ?? themeOptions[0];
+    themeOptions.find((o) => o.value === theme) ?? themeOptions[0];
 
   return (
     <DropdownMenu>

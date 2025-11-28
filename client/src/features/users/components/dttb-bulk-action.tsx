@@ -4,12 +4,14 @@ import type { Table } from "@tanstack/react-table";
 import { ArrowDownUp, CircleArrowUp, Download, Trash2 } from "lucide-react";
 import { roles, statuses } from "../data/constants";
 import type { User } from "../data/type";
+import { useUserStore } from "../data/store";
 
 interface DttbBulkActionsProps {
   table: Table<User>;
 }
 
 export function DttbBulkActions({ table }: DttbBulkActionsProps) {
+  const { setOpen } = useUserStore();
   return (
     <DataTableBulkActions
       table={table}
@@ -51,7 +53,7 @@ export function DttbBulkActions({ table }: DttbBulkActionsProps) {
             const rows = table
               .getFilteredSelectedRowModel()
               .rows.map((r) => r.original);
-            exportToXLSX(`selected.xlsx`, rows);
+            exportToXLSX({ rows });
           },
         },
         {
@@ -59,7 +61,7 @@ export function DttbBulkActions({ table }: DttbBulkActionsProps) {
           title: "Delete",
           variant: "destructive",
           onClick: () => {
-            // setOpen("deleteSelect");
+            setOpen("deleteSelect");
           },
         },
       ]}

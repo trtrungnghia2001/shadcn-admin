@@ -11,14 +11,108 @@ import UserDialog from "./components/UserDialog";
 import { useUserStore } from "./data/store";
 import DttbBulkActions from "./components/dttb-bulk-action";
 import ConfirmDialog from "@/components/customs/confirm-dialog";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { queryClient } from "@/main";
+import ButtonExport from "@/components/customs/button-export";
 
 const UsersPage = () => {
-  const { open, setOpen, data, setCurrentData, currentData, remove } =
-    useUserStore();
-  const { table } = useDataTable({
+  const {
+    open,
+    setOpen,
+    setCurrentData,
+    currentData,
+    data,
+    remove,
+    removeIds,
+    importExcel,
+    exportExcel,
+    fetchAll,
+  } = useUserStore();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const fetchAllQuery = useQuery({
+    queryKey: ["users", searchParams.toString()],
+    queryFn: async () => await fetchAll(searchParams.toString()),
+    placeholderData: (previousData) => previousData,
+  });
+
+  const importExcelMutation = useMutation({
+    mutationFn: async (file: File) => await importExcel(file),
+    onSuccess: (data) => toast.success(data.message),
+    onError: (error) => toast.error(error.message),
+  });
+  const exportExcelMutation = useMutation({
+    mutationFn: async () => await exportExcel(),
+    onSuccess: () => toast.success(`Exported successfully!`),
+    onError: (error) => toast.error(error.message),
+  });
+
+  const { table, columnFilters } = useDataTable({
     data: data,
     columns: DataTableColumn,
+    mode: "server",
   });
+
+  const handleSearch = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("name", value);
+    params.set("page", "1");
+    setSearchParams(params);
+  };
+
+  const handleFilter = () => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    // Reset page khi filter thay đổi
+    params.set("page", "1");
+
+    if (columnFilters.length === 0) {
+      Array.from(params.keys()).forEach((key) => {
+        if (["status", "role"].includes(key)) {
+          params.delete(key);
+        }
+      });
+
+      setSearchParams(params);
+      return;
+    }
+
+    // Add or delete filters vao url
+    columnFilters.forEach((filter) => {
+      if (
+        filter.value != null &&
+        !(Array.isArray(filter.value) && filter.value.length === 0)
+      ) {
+        const value = Array.isArray(filter.value)
+          ? filter.value.join(",")
+          : filter.value.toString();
+        params.set(filter.id, value);
+      } else {
+        params.delete(filter.id);
+      }
+    });
+
+    setSearchParams(params);
+  };
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    setSearchParams(params);
+  };
+
+  const handleRowsPerPageChange = (rowsPerPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("limit", rowsPerPage.toString());
+    setSearchParams(params);
+  };
+
+  useEffect(() => {
+    handleFilter();
+  }, [columnFilters]);
 
   return (
     <div className="space-y-5">
@@ -31,10 +125,15 @@ const UsersPage = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <ButtonExport
+            handleExport={() => exportExcelMutation.mutate()}
+            isLoading={exportExcelMutation.isPending}
+          />
           <ButtonImport
             handleImport={(file) => {
-              console.log({ file });
+              importExcelMutation.mutate(file);
             }}
+            isLoading={importExcelMutation.isPending}
           />
           <Button className="space-x-1" onClick={() => setOpen("create")}>
             <span>Create</span> <Plus size={18} />
@@ -44,6 +143,8 @@ const UsersPage = () => {
       {/* toolbar */}
       <DataTableToolbar
         table={table}
+        searchPlaceholder="Search by name..."
+        onSearchChange={handleSearch}
         filters={[
           { columnId: "status", title: "Status", options: statuses },
           {
@@ -56,7 +157,17 @@ const UsersPage = () => {
       {/* table */}
       <DataTable table={table} />
       {/* pagination */}
-      <DataTablePagination table={table} />
+      <DataTablePagination
+        table={table}
+        pagination={{
+          currentPage: fetchAllQuery.data?.page || 1,
+          totalPages: fetchAllQuery.data?.totalPages || 1,
+          onPageChange: handlePageChange,
+        }}
+        rowsPerPage={fetchAllQuery.data?.limit}
+        onRowsPerPageChange={handleRowsPerPageChange}
+      />
+
       {/* bulk actions */}
       <DttbBulkActions table={table} />
       {/* dialog */}
@@ -72,14 +183,22 @@ const UsersPage = () => {
         }}
         confirmText="Delete"
         confirmVariant="destructive"
-        handleConfirm={() => {
+        handleConfirm={async () => {
           if (open === "delete" && currentData) {
-            remove(currentData.id);
+            await remove(currentData._id);
           } else if (open === "deleteSelect") {
-            // handleDeleteSelectTask(
-            //   table.getFilteredSelectedRowModel().rows.map((r) => r.original)
-            // );
+            await removeIds(
+              table
+                .getFilteredSelectedRowModel()
+                .rows.map((r) => r.original)
+                .map((item) => item._id)
+            );
+
+            // set lai page
+            searchParams.set("page", "1");
+            setSearchParams(searchParams);
           }
+          queryClient.invalidateQueries({ queryKey: ["users"] });
           table.resetRowSelection();
         }}
       />

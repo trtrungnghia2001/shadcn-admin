@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Download, Loader } from "lucide-react";
+import { CloudUpload, Loader } from "lucide-react";
 import { memo, useState } from "react";
 import ImportDialog from "./components/ImportDialog";
 
@@ -23,7 +23,7 @@ const ButtonImport = ({ handleImport, isLoading }: ButtonImportProps) => {
         {isLoading ? (
           <Loader size={18} className="animate-spin" />
         ) : (
-          <Download size={18} />
+          <CloudUpload size={18} />
         )}
       </Button>
       <ImportDialog

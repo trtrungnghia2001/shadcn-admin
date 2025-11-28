@@ -31,15 +31,15 @@ const ChatUser = ({ user }: ChatUserProps) => {
         if (user._id === currentUser?._id) return;
         handleSelectCurrentUser(user);
       }}
-      className="border-b last:border-none py-1 cursor-pointer"
+      className={clsx([
+        `border-b last:border-none py-1 cursor-pointer rounded-lg`,
+        currentUser?._id === user._id && `bg-muted`,
+      ])}
     >
       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted">
         <div className="relative">
           <Avatar>
-            <AvatarImage
-              src={user.avatar || "https://github.com/shadcn.png"}
-              alt={user.name}
-            />
+            <AvatarImage src={user.avatar || ""} alt={user.name} />
             <AvatarFallback>{user.name}</AvatarFallback>
           </Avatar>
           {onlineUsers.includes(user._id) && (
