@@ -1,4 +1,4 @@
-# MERN Media World
+# Shadcn Admin Dashboard
 
 A full-featured admin dashboard built with React, ShadcnUI, and a Node.js backend, demonstrating modern web application patterns, real-time communication, and responsive design.
 
