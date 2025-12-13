@@ -35,7 +35,7 @@ const Search = () => {
         className="rounded-lg border shadow-md md:min-w-[450px]"
       >
         <CommandInput placeholder="Type a command or search..." />
-        <CommandList>
+        <CommandList className="scrollbar-beauty">
           <CommandEmpty>No results found.</CommandEmpty>
           {sidebarLinks.map((side) => (
             <CommandGroup key={side.label} heading={side.label}>

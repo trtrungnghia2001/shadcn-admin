@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import { Toaster } from "./components/ui/sonner";
 import RouterTree from "./routers";
 import { useEffect } from "react";
+import VideoCall from "./features/chats/components/VideoCall";
 
 const App = () => {
   const location = useLocation();
@@ -12,6 +13,7 @@ const App = () => {
     <div>
       <RouterTree />
       <Toaster />
+      <VideoCall />
     </div>
   );
 };

@@ -121,7 +121,7 @@ const UsersPage = () => {
         <div>
           <h2>User List</h2>
           <p className="text-muted-foreground">
-            Manage your users and their roles here.
+            Manage your users and their roles here. Use zustand and restful api
           </p>
         </div>
         <div className="flex gap-2">

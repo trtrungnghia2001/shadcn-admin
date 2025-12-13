@@ -16,6 +16,7 @@ import {
   Palette,
   Bell,
   Smartphone,
+  NotebookPen,
 } from "lucide-react";
 import type { SidebarGroup } from "./type";
 
@@ -26,6 +27,7 @@ export const sidebarLinks: SidebarGroup[] = [
       { icon: LayoutDashboard, path: "/", label: "Dashboard" },
       { icon: ListTodo, path: "/tasks", label: "Tasks" },
       { icon: Package, path: "/apps", label: "Apps" },
+      { icon: NotebookPen, path: "/notes", label: "Notes" },
       { icon: MessagesSquare, path: "/chats", label: "Chats" },
       { icon: Users, path: "/users", label: "Users" },
     ],

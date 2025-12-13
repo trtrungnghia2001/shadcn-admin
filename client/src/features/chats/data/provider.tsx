@@ -13,9 +13,8 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [users, setUsers] = useState<ChatUserType[]>([]);
   const [typingUser, setTypingUser] = useState<boolean>(false);
 
+  // connect /disconect
   useEffect(() => {
-    console.log({ auth });
-
     if (!auth) {
       socket.disconnect();
       return;

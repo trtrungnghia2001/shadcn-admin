@@ -1,3 +1,4 @@
+import AuthProtected from "@/features/_authen/components/AuthProtected";
 import AccountForm from "../components/AccountForm";
 import AppearanceForm from "../components/AppearanceForm";
 import DisplayForm from "../components/DisplayForm";
@@ -6,7 +7,11 @@ import NotificationsForm from "../components/NotificationsForm";
 export const settingTabs = [
   {
     key: "Account",
-    element: <AccountForm />,
+    element: (
+      <AuthProtected>
+        <AccountForm />
+      </AuthProtected>
+    ),
     title: "Account",
     description: `Update your account settings. Set your preferred language and timezone.`,
   },

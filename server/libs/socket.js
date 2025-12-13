@@ -33,6 +33,19 @@ export async function connectSocket(server) {
 
       io.to(receiverSocket).emit("chat-writing", { userId, typing });
     });
+
+    // video call
+    socket.on("offer", ({ offer, to }) => {
+      io.to(to).emit("offer", { offer, from: socket.id });
+    });
+
+    socket.on("answer", ({ answer, to }) => {
+      io.to(to).emit("answer", { answer });
+    });
+
+    socket.on("iceCandidate", (candidate) => {
+      socket.broadcast.emit("iceCandidate", candidate);
+    });
   });
 }
 

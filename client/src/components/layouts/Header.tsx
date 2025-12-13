@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import clsx from "clsx";
 import { Button } from "../ui/button";
 import { Settings } from "lucide-react";
@@ -41,33 +41,42 @@ const Header = () => {
         <Button size="icon" variant="ghost" className="rounded-full">
           <Settings />
         </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Avatar>
-              <AvatarImage src={auth?.avatar || ""} alt="@shadcn" />
-              <AvatarFallback>
-                {auth?.name.split(" ").map((item) => item[0])}
-              </AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-40" align="end">
-            <DropdownMenuLabel className="text-xs">
-              <p className="font-medium">{auth?.name}</p>
-              <p className="text-muted-foreground font-normal">{auth?.email}</p>
-            </DropdownMenuLabel>
-            <Separator />
-            <DropdownMenuGroup>
-              {navs?.map((item) => (
-                <DropdownMenuItem key={item.path} asChild>
-                  <NavLink to={item.path}>{item.label}</NavLink>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuGroup>
+        {!auth && (
+          <Button variant={"outline"} size={"sm"} asChild>
+            <Link to={`/signin`}>Sigin</Link>
+          </Button>
+        )}
+        {auth && (
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Avatar>
+                <AvatarImage src={auth?.avatar || ""} alt="@shadcn" />
+                <AvatarFallback>
+                  {auth?.name.split(" ").map((item) => item[0])}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-40" align="end">
+              <DropdownMenuLabel className="text-xs">
+                <p className="font-medium">{auth?.name}</p>
+                <p className="text-muted-foreground font-normal">
+                  {auth?.email}
+                </p>
+              </DropdownMenuLabel>
+              <Separator />
+              <DropdownMenuGroup>
+                {navs?.map((item) => (
+                  <DropdownMenuItem key={item.path} asChild>
+                    <NavLink to={item.path}>{item.label}</NavLink>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuGroup>
 
-            <Separator />
-            <DropdownMenuItem onClick={signout}>Sign out</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <Separator />
+              <DropdownMenuItem onClick={signout}>Sign out</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </header>
   );

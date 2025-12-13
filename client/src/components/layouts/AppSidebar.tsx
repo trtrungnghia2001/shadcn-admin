@@ -18,16 +18,26 @@ import {
 
 import clsx from "clsx";
 import { ChevronRight, VenusAndMars } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useAuthStore } from "@/features/_authen/data/store";
 import { sidebarLinks } from "./data/constant";
+import { useSidebar } from "@/components/ui/sidebar";
+
 export function AppSidebar() {
   const { auth } = useAuthStore();
+  const { isMobile, setOpenMobile } = useSidebar();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }, [location.pathname]);
 
   return (
-    <Sidebar className="p-2 ">
+    <Sidebar className="p-2">
       <SidebarHeader className="bg-background ">
         <Link to={`/`}>
           <div className="flex items-center gap-2 p-2">

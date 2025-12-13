@@ -38,7 +38,8 @@ const TasksPage = () => {
         <div>
           <h2>Tasks</h2>
           <p className="text-muted-foreground">
-            Here's a list of your tasks for this month!
+            Here's a list of your tasks for this month! Use context and
+            localStorage
           </p>
         </div>
         <div className="flex gap-2">

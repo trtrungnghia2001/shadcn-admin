@@ -42,9 +42,12 @@ const SigninPage = () => {
             </Link>
             .
           </div>
-          <div className="text-muted-foreground text-center">
+          <div className="text-muted-foreground text-center space-x-4">
             <Link to={`/forgot-password`} className="underline">
               Forgot Password?
+            </Link>
+            <Link to={`/`} className="underline">
+              Go to Home
             </Link>
           </div>
         </CardFooter>

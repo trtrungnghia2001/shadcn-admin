@@ -13,16 +13,15 @@ import SigninPage from "@/features/_authen/pages/SigninPage";
 import SignupPage from "@/features/_authen/pages/SignupPage";
 import AuthProtected from "@/features/_authen/components/AuthProtected";
 import SettingRouter from "./(settings)";
+import NotesPage from "@/features/notes";
+import { store } from "@/features/notes/data/store";
+import { Provider } from "react-redux";
 
 const RouterTree = () => {
   const routers = useRoutes([
     {
       path: `/`,
-      element: (
-        <AuthProtected>
-          <Layout />
-        </AuthProtected>
-      ),
+      element: <Layout />,
       children: [
         {
           index: true,
@@ -41,8 +40,20 @@ const RouterTree = () => {
           element: <AppPage />,
         },
         {
+          path: "notes",
+          element: (
+            <Provider store={store}>
+              <NotesPage />
+            </Provider>
+          ),
+        },
+        {
           path: "users",
-          element: <UsersPage />,
+          element: (
+            <AuthProtected>
+              <UsersPage />
+            </AuthProtected>
+          ),
         },
         {
           path: "auth/*",
@@ -54,7 +65,11 @@ const RouterTree = () => {
         },
         {
           path: "chats/*",
-          element: <ChatPage />,
+          element: (
+            <AuthProtected>
+              <ChatPage />
+            </AuthProtected>
+          ),
         },
         {
           path: "settings/*",
