@@ -1,21 +1,17 @@
-export const pcConfig: RTCConfiguration = {
-  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-};
-
 export const createPeer = (
   onTrack: (stream: MediaStream) => void,
-  onIceCandidate: (candidate: RTCIceCandidate) => void
+  onIceCandidate: (candidate: RTCIceCandidateInit) => void
 ) => {
-  const pc = new RTCPeerConnection(pcConfig);
+  const pc = new RTCPeerConnection({
+    iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+  });
 
-  pc.ontrack = (e) => {
-    onTrack(e.streams[0]);
+  pc.onicecandidate = (event) => {
+    if (event.candidate) onIceCandidate(event.candidate);
   };
 
-  pc.onicecandidate = (e) => {
-    if (e.candidate) {
-      onIceCandidate(e.candidate);
-    }
+  pc.ontrack = (event) => {
+    onTrack(event.streams[0]);
   };
 
   return pc;

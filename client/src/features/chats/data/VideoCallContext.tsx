@@ -40,9 +40,6 @@ export const VideoCallProvider = ({
     }) => {
       targetIdRef.current = from;
       pendingOfferRef.current = offer;
-
-      console.log({ offer, from });
-
       setCallState("incoming");
     };
 
@@ -60,7 +57,11 @@ export const VideoCallProvider = ({
     }: {
       candidate: RTCIceCandidateInit;
     }) => {
-      await peerRef.current?.addIceCandidate(candidate);
+      try {
+        await peerRef.current?.addIceCandidate(candidate);
+      } catch (err) {
+        console.log("Failed addIceCandidate:", err);
+      }
     };
 
     socket.on("offer", onOffer);
@@ -82,17 +83,13 @@ export const VideoCallProvider = ({
       video: true,
       audio: true,
     });
-
     setLocalStream(stream);
 
     peerRef.current = createPeer(
       (remoteStream) => setRemoteStream(remoteStream),
       (candidate) => {
         if (targetIdRef.current) {
-          socket.emit("ice-candidate", {
-            to: targetIdRef.current,
-            candidate,
-          });
+          socket.emit("ice-candidate", { to: targetIdRef.current, candidate });
         }
       }
     );
@@ -119,16 +116,12 @@ export const VideoCallProvider = ({
     if (!pendingOfferRef.current || !targetIdRef.current) return;
 
     await initPeer();
-
     await peerRef.current!.setRemoteDescription(pendingOfferRef.current);
 
     const answer = await peerRef.current!.createAnswer();
     await peerRef.current!.setLocalDescription(answer);
 
-    socket.emit("answer", {
-      to: targetIdRef.current,
-      answer,
-    });
+    socket.emit("answer", { to: targetIdRef.current, answer });
 
     pendingOfferRef.current = null;
     setCallState("in-call");
@@ -149,7 +142,6 @@ export const VideoCallProvider = ({
     setLocalStream(null);
     setRemoteStream(null);
     setCallState("idle");
-
     targetIdRef.current = null;
     pendingOfferRef.current = null;
   };
@@ -173,8 +165,7 @@ export const VideoCallProvider = ({
 
 export const useVideoCall = () => {
   const ctx = useContext(VideoCallContext);
-  if (!ctx) {
+  if (!ctx)
     throw new Error("useVideoCall must be used inside VideoCallProvider");
-  }
   return ctx;
 };
