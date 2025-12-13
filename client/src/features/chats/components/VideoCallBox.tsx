@@ -36,6 +36,7 @@ export const VideoCallBox = () => {
           ref={remoteRef}
           autoPlay
           playsInline
+          muted={false}
           className="w-full h-full object-cover"
         />
 
