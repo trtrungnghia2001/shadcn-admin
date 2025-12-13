@@ -42,7 +42,7 @@ export const VideoCallProvider = ({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
 
-    // attach events
+    // event handlers
     pc.oniceconnectionstatechange = () => {
       console.log("ICE state:", pc.iceConnectionState);
     };
@@ -61,9 +61,7 @@ export const VideoCallProvider = ({
       }
     };
 
-    // add local tracks
     stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-
     peerRef.current = pc;
   };
 
