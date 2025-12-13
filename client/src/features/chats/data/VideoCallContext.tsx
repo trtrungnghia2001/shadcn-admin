@@ -28,11 +28,29 @@ export const VideoCallProvider = ({
   const targetIdRef = useRef<string | null>(null);
   const pendingOfferRef = useRef<RTCSessionDescriptionInit | null>(null);
 
-  // ================= WEBRTC PEER CREATION =================
-  const createPeer = () => {
+  // ================= WEBRTC =================
+  const initPeer = async () => {
+    if (peerRef.current) return;
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
+    setLocalStream(stream);
+
     const pc = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
+
+    // attach events
+    pc.oniceconnectionstatechange = () => {
+      console.log("ICE state:", pc.iceConnectionState);
+    };
+
+    pc.ontrack = (event) => {
+      console.log("Remote track received:", event.streams[0]);
+      setRemoteStream(event.streams[0]);
+    };
 
     pc.onicecandidate = (event) => {
       if (event.candidate && targetIdRef.current) {
@@ -43,31 +61,10 @@ export const VideoCallProvider = ({
       }
     };
 
-    pc.ontrack = (event) => {
-      setRemoteStream(event.streams[0]);
-    };
+    // add local tracks
+    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
-    pc.oniceconnectionstatechange = () => {
-      console.log("ICE state:", pc.iceConnectionState);
-    };
-
-    return pc;
-  };
-
-  const initPeer = async () => {
-    if (peerRef.current) return;
-
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    setLocalStream(stream);
-
-    peerRef.current = createPeer();
-
-    stream
-      .getTracks()
-      .forEach((track) => peerRef.current!.addTrack(track, stream));
+    peerRef.current = pc;
   };
 
   // ================= SOCKET LISTENERS =================
@@ -82,7 +79,6 @@ export const VideoCallProvider = ({
       targetIdRef.current = from;
       pendingOfferRef.current = offer;
       setCallState("incoming");
-      console.log("Incoming call from:", from, offer);
     };
 
     const onAnswer = async ({
@@ -93,7 +89,6 @@ export const VideoCallProvider = ({
       if (!peerRef.current) return;
       await peerRef.current.setRemoteDescription(answer);
       setCallState("in-call");
-      console.log("Call connected, remote answer applied");
     };
 
     const onIceCandidate = async ({
