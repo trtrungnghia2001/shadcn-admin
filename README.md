@@ -64,3 +64,4 @@ The dashboard also showcases responsive design, dark/light theme, and integratio
 <img width="1920" height="1011" alt="2" src="https://github.com/user-attachments/assets/fb449602-42e9-478a-9913-a95eb6b8a429" />
 <img width="1920" height="863" alt="3" src="https://github.com/user-attachments/assets/fbba1e33-eb5f-432f-9c40-7f54509ea8ee" />
 <img width="1920" height="1183" alt="4" src="https://github.com/user-attachments/assets/b65c7093-0f87-449a-91ee-84fe5c99ec39" />
+<img width="2230" height="868" alt="5" src="https://github.com/user-attachments/assets/c5ba8ba8-7bf9-4e93-83b4-b4f811e695c4" />
