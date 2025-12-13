@@ -3,4 +3,5 @@ import ENV_CONFIG from "./env";
 
 export const socket = io(ENV_CONFIG.URL_SOCKET, {
   autoConnect: false,
+  transports: ["websocket"],
 });
