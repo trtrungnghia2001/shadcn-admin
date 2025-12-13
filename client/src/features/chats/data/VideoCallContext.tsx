@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { socket } from "@/lib/socket";
-import { createPeer } from "./webrtc";
 
 type CallState = "idle" | "calling" | "incoming" | "in-call";
 
@@ -29,9 +28,51 @@ export const VideoCallProvider = ({
   const targetIdRef = useRef<string | null>(null);
   const pendingOfferRef = useRef<RTCSessionDescriptionInit | null>(null);
 
+  // ================= WEBRTC PEER CREATION =================
+  const createPeer = () => {
+    const pc = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    });
+
+    pc.onicecandidate = (event) => {
+      if (event.candidate && targetIdRef.current) {
+        socket.emit("ice-candidate", {
+          to: targetIdRef.current,
+          candidate: event.candidate,
+        });
+      }
+    };
+
+    pc.ontrack = (event) => {
+      setRemoteStream(event.streams[0]);
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log("ICE state:", pc.iceConnectionState);
+    };
+
+    return pc;
+  };
+
+  const initPeer = async () => {
+    if (peerRef.current) return;
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
+    setLocalStream(stream);
+
+    peerRef.current = createPeer();
+
+    stream
+      .getTracks()
+      .forEach((track) => peerRef.current!.addTrack(track, stream));
+  };
+
   // ================= SOCKET LISTENERS =================
   useEffect(() => {
-    const onOffer = ({
+    const onOffer = async ({
       offer,
       from,
     }: {
@@ -41,6 +82,7 @@ export const VideoCallProvider = ({
       targetIdRef.current = from;
       pendingOfferRef.current = offer;
       setCallState("incoming");
+      console.log("Incoming call from:", from, offer);
     };
 
     const onAnswer = async ({
@@ -48,8 +90,10 @@ export const VideoCallProvider = ({
     }: {
       answer: RTCSessionDescriptionInit;
     }) => {
-      await peerRef.current?.setRemoteDescription(answer);
+      if (!peerRef.current) return;
+      await peerRef.current.setRemoteDescription(answer);
       setCallState("in-call");
+      console.log("Call connected, remote answer applied");
     };
 
     const onIceCandidate = async ({
@@ -57,8 +101,9 @@ export const VideoCallProvider = ({
     }: {
       candidate: RTCIceCandidateInit;
     }) => {
+      if (!peerRef.current) return;
       try {
-        await peerRef.current?.addIceCandidate(candidate);
+        await peerRef.current.addIceCandidate(candidate);
       } catch (err) {
         console.log("Failed addIceCandidate:", err);
       }
@@ -74,30 +119,6 @@ export const VideoCallProvider = ({
       socket.off("ice-candidate", onIceCandidate);
     };
   }, []);
-
-  // ================= WEBRTC =================
-  const initPeer = async () => {
-    if (peerRef.current) return;
-
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    setLocalStream(stream);
-
-    peerRef.current = createPeer(
-      (remoteStream) => setRemoteStream(remoteStream),
-      (candidate) => {
-        if (targetIdRef.current) {
-          socket.emit("ice-candidate", { to: targetIdRef.current, candidate });
-        }
-      }
-    );
-
-    stream
-      .getTracks()
-      .forEach((track) => peerRef.current!.addTrack(track, stream));
-  };
 
   // ================= ACTIONS =================
   const startCall = async (targetId: string) => {
@@ -138,9 +159,9 @@ export const VideoCallProvider = ({
     peerRef.current = null;
 
     localStream?.getTracks().forEach((t) => t.stop());
-
     setLocalStream(null);
     setRemoteStream(null);
+
     setCallState("idle");
     targetIdRef.current = null;
     pendingOfferRef.current = null;
