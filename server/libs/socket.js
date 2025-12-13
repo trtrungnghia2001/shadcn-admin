@@ -35,16 +35,23 @@ export async function connectSocket(server) {
     });
 
     // video call
-    socket.on("offer", ({ offer, to }) => {
-      io.to(to).emit("offer", { offer, from: socket.id });
+    socket.on("offer", (data) => {
+      socket.to(getSocketId(data.to)).emit("offer", {
+        offer: data.offer,
+        from: socket.id,
+      });
     });
-
-    socket.on("answer", ({ answer, to }) => {
-      io.to(to).emit("answer", { answer });
+    socket.on("answer", (data) => {
+      socket.to(getSocketId(data.to)).emit("answer", {
+        answer: data.answer,
+        from: socket.id,
+      });
     });
-
-    socket.on("iceCandidate", (candidate) => {
-      socket.broadcast.emit("iceCandidate", candidate);
+    socket.on("ice-candidate", (data) => {
+      socket.to(getSocketId(data.to)).emit("ice-candidate", {
+        candidate: data.candidate,
+        from: socket.id,
+      });
     });
   });
 }

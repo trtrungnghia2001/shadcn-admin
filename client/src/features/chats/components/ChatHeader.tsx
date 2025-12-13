@@ -4,18 +4,12 @@ import { ArrowLeft, EllipsisVertical, Phone, Video } from "lucide-react";
 import { useChatContext } from "../data/context";
 import { memo } from "react";
 import clsx from "clsx";
-import { useVideoCall } from "../data/videoCall.context";
+import { useVideoCall } from "../data/VideoCallContext";
 
 const ChatHeader = () => {
   const { currentUser, onlineUsers, setCurrentUser } = useChatContext();
   const { startCall } = useVideoCall();
   const isOnline = onlineUsers.includes(currentUser?._id as string);
-
-  const handleVideoCall = async () => {
-    if (!currentUser) return;
-
-    await startCall(currentUser._id);
-  };
 
   return (
     <div className="p-4 flex items-center justify-between gap-8 shadow-lg">
@@ -49,10 +43,14 @@ const ChatHeader = () => {
       </div>
       <div className="flex items-center gap-2">
         <Button
-          onClick={handleVideoCall}
           variant={"ghost"}
           size={"icon"}
           className="rounded-full"
+          onClick={() => {
+            if (currentUser) {
+              startCall(currentUser._id);
+            }
+          }}
         >
           <Video />
         </Button>
