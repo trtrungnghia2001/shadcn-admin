@@ -107,7 +107,7 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
     const pc = localPcRef.current[peerId];
     if (!pc) return;
 
-    // Thêm track nếu chưa có
+    // Add track local lần này
     stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
     const answer = await pc.createAnswer();
@@ -147,10 +147,32 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
   // Socket listeners
   useEffect(() => {
     socket.on("call-user", async ({ fromUserId, offer }) => {
-      const stream = await getLocalStream();
-      const { pc, remoteStream } = createPeerConnection(fromUserId, stream);
+      // Tạo pc nhưng không add track local
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      });
+      const remoteStream = new MediaStream();
+
+      pc.ontrack = (event) => {
+        event.streams[0].getTracks().forEach((t) => remoteStream.addTrack(t));
+        setPeers((prev) => ({
+          ...prev,
+          [fromUserId]: { pc, remoteStream, inCall: true },
+        }));
+      };
+
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit("ice-candidate", {
+            toUserId: fromUserId,
+            candidate: event.candidate.toJSON(),
+          });
+        }
+      };
 
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
+
+      localPcRef.current[fromUserId] = pc;
 
       setReceivingCallFrom(fromUserId);
       setPeers((prev) => ({
