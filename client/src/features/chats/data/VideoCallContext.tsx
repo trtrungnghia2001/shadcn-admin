@@ -44,7 +44,7 @@ export const VideoCallProvider: React.FC<{ children: React.ReactNode }> = ({
   const getLocalStream = async () => {
     if (!localStream) {
       const stream = await navigator.mediaDevices.getUserMedia({
-        // video: true,
+        video: true,
         audio: true,
       });
       setLocalStream(stream);

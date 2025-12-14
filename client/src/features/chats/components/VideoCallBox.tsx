@@ -35,7 +35,14 @@ export const VideoCallBox = () => {
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
       <div className="relative w-[800px] h-[450px] bg-black rounded-xl overflow-hidden">
         {/* Remote video */}
-        <video ref={remoteRef} className="w-40" playsInline muted />
+        {callState === "in-call" && (
+          <video
+            ref={remoteRef}
+            className="w-full h-full object-cover"
+            playsInline
+            muted
+          />
+        )}
 
         {/* Local video */}
         <video

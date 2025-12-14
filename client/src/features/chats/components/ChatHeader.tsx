@@ -30,7 +30,7 @@ const ChatHeader = () => {
           <AvatarFallback>{currentUser?.name}</AvatarFallback>
         </Avatar>
         <div>
-          <p className="font-medium">{currentUser?.name}</p>
+          <p className="font-medium line-clamp-1">{currentUser?.name}</p>
           <p
             className={clsx([
               `line-clamp-1 text-xs`,
