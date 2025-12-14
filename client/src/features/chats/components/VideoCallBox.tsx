@@ -10,38 +10,22 @@ export const VideoCallBox = () => {
     acceptCall,
     rejectCall,
   } = useVideoCall();
-
   const localRef = useRef<HTMLVideoElement>(null);
   const remoteRef = useRef<HTMLVideoElement>(null);
 
+  // Bind local stream
   useEffect(() => {
     if (localRef.current && localStream) {
       localRef.current.srcObject = localStream;
-      localRef.current
-        .play()
-        .catch((err) => console.error("Error playing local video:", err));
+      localRef.current.play().catch(console.error);
     }
   }, [localStream]);
 
+  // Bind remote stream
   useEffect(() => {
-    if (!remoteRef.current) return;
-    const videoEl = remoteRef.current;
-
-    if (remoteStream) {
-      videoEl.srcObject = remoteStream;
-      const handleLoadedMetadata = () => {
-        videoEl.play().catch((err) => {
-          if (err.name !== "AbortError")
-            console.error("Error playing remote video:", err);
-        });
-      };
-      videoEl.addEventListener("loadedmetadata", handleLoadedMetadata);
-      return () =>
-        videoEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
-    } else {
-      // Cleanup khi call end
-      videoEl.pause();
-      videoEl.srcObject = null;
+    if (remoteRef.current && remoteStream) {
+      remoteRef.current.srcObject = remoteStream;
+      remoteRef.current.play().catch(console.error);
     }
   }, [remoteStream]);
 
@@ -51,13 +35,7 @@ export const VideoCallBox = () => {
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
       <div className="relative w-[800px] h-[450px] bg-black rounded-xl overflow-hidden">
         {/* Remote video */}
-        <video
-          className="img"
-          playsInline
-          muted // tạm thời để Chrome autoplay, bỏ khi test audio
-          controls={false}
-          ref={remoteRef}
-        />
+        <video ref={remoteRef} className="w-40" playsInline muted />
 
         {/* Local video */}
         <video
