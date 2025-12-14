@@ -39,6 +39,9 @@ export const VideoCallProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const remoteUserRef = useRef<string | null>(null);
+  const pendingCandidatesRef = useRef<RTCIceCandidateInit[]>([]);
+
+  /* -------------------- helpers -------------------- */
 
   const getLocalStream = async () => {
     if (!localStream) {
@@ -47,86 +50,100 @@ export const VideoCallProvider: React.FC<{ children: React.ReactNode }> = ({
         audio: true,
       });
       setLocalStream(stream);
-      console.log("[VideoCall] Obtained local stream:", stream);
+      console.log("[VideoCall] Got local stream");
+      stream.getVideoTracks().forEach((t) => {
+        console.log("video track:", t.readyState, t.enabled);
+      });
       return stream;
     }
     return localStream;
   };
+
+  const flushPendingCandidates = async () => {
+    if (!pcRef.current) return;
+
+    for (const c of pendingCandidatesRef.current) {
+      try {
+        await pcRef.current.addIceCandidate(c);
+      } catch (err) {
+        console.error("[VideoCall] Flush ICE error:", err);
+      }
+    }
+    pendingCandidatesRef.current = [];
+  };
+
+  const createPeerConnection = () => {
+    const pc = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    });
+
+    pc.oniceconnectionstatechange = () => {
+      console.log("[VideoCall] ICE state:", pc.iceConnectionState);
+    };
+
+    pc.addTransceiver("video", { direction: "sendrecv" });
+    pc.addTransceiver("audio", { direction: "sendrecv" });
+
+    return pc;
+  };
+
+  /* -------------------- socket handlers -------------------- */
 
   useEffect(() => {
     const handleOffer = async (data: {
       offer: RTCSessionDescriptionInit;
       from: string;
     }) => {
-      const { offer, from } = data;
-      console.log("[VideoCall] Received offer from:", from, offer);
-      remoteUserRef.current = from;
+      console.log("[VideoCall] Received offer");
+      remoteUserRef.current = data.from;
       setCallState("incoming");
 
       const stream = await getLocalStream();
+      pcRef.current = createPeerConnection();
 
-      pcRef.current = new RTCPeerConnection({
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-      });
-      console.log("[VideoCall] Created RTCPeerConnection for incoming call");
+      stream.getTracks().forEach((t) => pcRef.current!.addTrack(t, stream));
 
-      // Add local tracks
-      stream.getTracks().forEach((track) => {
-        pcRef.current!.addTrack(track, stream);
-        console.log("[VideoCall] Added local track:", track.kind);
-      });
-
-      // Handle remote tracks
       const remote = new MediaStream();
-      pcRef.current.ontrack = (event: RTCTrackEvent) => {
-        console.log("[VideoCall] Received remote track:", event.track.kind);
-
-        if (event.streams[0]) {
-          setRemoteStream(event.streams[0]);
+      pcRef.current.ontrack = (e) => {
+        console.log("[ontrack] kind:", e.track.kind, "streams:", e.streams);
+        if (e.streams[0]) {
+          setRemoteStream(e.streams[0]);
         } else {
-          remote.addTrack(event.track);
+          remote.addTrack(e.track);
+          setRemoteStream(remote);
         }
-        if (!event.streams[0])
-          console.log("[VideoCall] Remote stream updated:", remote);
       };
 
-      // Handle ICE candidates
-      pcRef.current.onicecandidate = (event) => {
-        if (event.candidate) {
-          console.log("[VideoCall] Sending ICE candidate:", event.candidate);
+      pcRef.current.onicecandidate = (e) => {
+        if (e.candidate) {
           socket.emit("ice-candidate", {
-            to: from,
-            candidate: event.candidate,
+            to: data.from,
+            candidate: e.candidate,
           });
         }
       };
 
-      await pcRef.current.setRemoteDescription(offer);
-      console.log("[VideoCall] Set remote description for incoming call");
+      await pcRef.current.setRemoteDescription(data.offer);
+      await flushPendingCandidates();
     };
 
     const handleAnswer = async (data: {
       answer: RTCSessionDescriptionInit;
     }) => {
-      const { answer } = data;
-      console.log("[VideoCall] Received answer:", answer);
-      if (pcRef.current) {
-        await pcRef.current.setRemoteDescription(answer);
-        setCallState("in-call");
-        console.log("[VideoCall] Set remote description for answer");
-      }
+      if (!pcRef.current) return;
+
+      await pcRef.current.setRemoteDescription(data.answer);
+      await flushPendingCandidates();
+      setCallState("in-call");
     };
 
     const handleICE = async (data: { candidate: RTCIceCandidateInit }) => {
-      const { candidate } = data;
-      console.log("[VideoCall] Received ICE candidate:", candidate);
-      if (pcRef.current && candidate) {
-        try {
-          await pcRef.current.addIceCandidate(candidate);
-          console.log("[VideoCall] Added ICE candidate successfully");
-        } catch (err) {
-          console.error("[VideoCall] Error adding ICE candidate:", err);
-        }
+      if (!pcRef.current || !data.candidate) return;
+
+      if (pcRef.current.remoteDescription) {
+        await pcRef.current.addIceCandidate(data.candidate);
+      } else {
+        pendingCandidatesRef.current.push(data.candidate);
       }
     };
 
@@ -141,83 +158,78 @@ export const VideoCallProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
+  /* -------------------- actions -------------------- */
+
   const startCall = async (targetId: string) => {
-    console.log("[VideoCall] Starting call to:", targetId);
     remoteUserRef.current = targetId;
     setCallState("calling");
 
     const stream = await getLocalStream();
+    pcRef.current = createPeerConnection();
 
-    pcRef.current = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-    });
-    console.log("[VideoCall] Created RTCPeerConnection for outgoing call");
-
-    stream.getTracks().forEach((track) => {
-      pcRef.current!.addTrack(track, stream);
-      console.log("[VideoCall] Added local track:", track.kind);
-    });
+    stream.getTracks().forEach((t) => pcRef.current!.addTrack(t, stream));
 
     const remote = new MediaStream();
-    pcRef.current.ontrack = (event: RTCTrackEvent) => {
-      console.log("[VideoCall] Received remote track:", event.track.kind);
-      if (event.streams[0]) {
-        setRemoteStream(event.streams[0]);
+    pcRef.current.ontrack = (e) => {
+      if (e.streams[0]) {
+        setRemoteStream(e.streams[0]);
       } else {
-        remote.addTrack(event.track);
+        remote.addTrack(e.track);
+        setRemoteStream(remote);
       }
-
-      if (!event.streams[0])
-        console.log("[VideoCall] Remote stream updated:", remote);
     };
 
-    pcRef.current.onicecandidate = (event) => {
-      if (event.candidate && remoteUserRef.current) {
-        console.log("[VideoCall] Sending ICE candidate:", event.candidate);
+    pcRef.current.onicecandidate = (e) => {
+      if (e.candidate && remoteUserRef.current) {
         socket.emit("ice-candidate", {
           to: remoteUserRef.current,
-          candidate: event.candidate,
+          candidate: e.candidate,
         });
       }
     };
 
     const offer = await pcRef.current.createOffer();
     await pcRef.current.setLocalDescription(offer);
-    console.log("[VideoCall] Created offer:", offer);
 
     socket.emit("offer", { to: targetId, offer });
   };
 
   const acceptCall = async () => {
     if (!pcRef.current || !remoteUserRef.current) return;
-    setCallState("in-call");
-    console.log("[VideoCall] Accepting call");
 
     const answer = await pcRef.current.createAnswer();
     await pcRef.current.setLocalDescription(answer);
 
-    socket.emit("answer", { to: remoteUserRef.current, answer });
-    console.log("[VideoCall] Sent answer:", answer);
+    socket.emit("answer", {
+      to: remoteUserRef.current,
+      answer,
+    });
+
+    setCallState("in-call");
   };
 
   const rejectCall = () => {
-    console.log("[VideoCall] Rejecting call");
-    setCallState("idle");
     pcRef.current?.close();
     pcRef.current = null;
     remoteUserRef.current = null;
     setRemoteStream(null);
+    setCallState("idle");
   };
 
   const endCall = () => {
     console.log("[VideoCall] Ending call");
     setCallState("idle");
+
+    // Stop local tracks
+    localStream?.getTracks().forEach((track) => track.stop());
+    setLocalStream(null);
+
+    // Cleanup remote stream
+    setRemoteStream(null);
+
     pcRef.current?.close();
     pcRef.current = null;
     remoteUserRef.current = null;
-    setRemoteStream(null);
-    localStream?.getTracks().forEach((track) => track.stop());
-    setLocalStream(null);
   };
 
   return (

@@ -17,12 +17,31 @@ export const VideoCallBox = () => {
   useEffect(() => {
     if (localRef.current && localStream) {
       localRef.current.srcObject = localStream;
+      localRef.current
+        .play()
+        .catch((err) => console.error("Error playing local video:", err));
     }
   }, [localStream]);
 
   useEffect(() => {
-    if (remoteRef.current && remoteStream) {
-      remoteRef.current.srcObject = remoteStream;
+    if (!remoteRef.current) return;
+    const videoEl = remoteRef.current;
+
+    if (remoteStream) {
+      videoEl.srcObject = remoteStream;
+      const handleLoadedMetadata = () => {
+        videoEl.play().catch((err) => {
+          if (err.name !== "AbortError")
+            console.error("Error playing remote video:", err);
+        });
+      };
+      videoEl.addEventListener("loadedmetadata", handleLoadedMetadata);
+      return () =>
+        videoEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
+    } else {
+      // Cleanup khi call end
+      videoEl.pause();
+      videoEl.srcObject = null;
     }
   }, [remoteStream]);
 
@@ -33,20 +52,20 @@ export const VideoCallBox = () => {
       <div className="relative w-[800px] h-[450px] bg-black rounded-xl overflow-hidden">
         {/* Remote video */}
         <video
-          ref={remoteRef}
-          autoPlay
+          className="img"
           playsInline
-          muted={false}
-          className="w-full h-full object-cover"
+          muted // tạm thời để Chrome autoplay, bỏ khi test audio
+          controls={false}
+          ref={remoteRef}
         />
 
         {/* Local video */}
         <video
           ref={localRef}
-          autoPlay
-          muted
-          playsInline
           className="absolute bottom-4 right-4 w-40 h-28 rounded-lg border object-cover"
+          autoPlay
+          playsInline
+          muted
         />
 
         {/* Controls */}
