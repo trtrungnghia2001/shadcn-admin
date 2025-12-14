@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import { v4 as uuid } from "uuid";
 
 let io;
 const userMap = new Map();
@@ -26,6 +27,7 @@ export async function connectSocket(server) {
       io.emit("onlineUsers", Array.from(userMap.keys()));
     });
 
+    /* ================= CHAT ================= */
     socket.on("chat-writing", ({ receiverId, typing }) => {
       const receiverSocket = userMap.get(receiverId);
 
@@ -34,24 +36,33 @@ export async function connectSocket(server) {
       io.to(receiverSocket).emit("chat-writing", { userId, typing });
     });
 
-    // video call
-    socket.on("offer", (data) => {
-      socket.to(getSocketId(data.to)).emit("offer", {
-        offer: data.offer,
-        from: socket.id,
+    // ================= VIDEO CALL / WebRTC =================
+    socket.on("call-user", ({ toUserId, offer }) => {
+      const targetSocket = getSocketId(toUserId);
+      if (!targetSocket) return;
+      io.to(targetSocket).emit("call-user", { fromUserId: userId, offer });
+    });
+
+    socket.on("answer-call", ({ toUserId, answer }) => {
+      const targetSocket = getSocketId(toUserId);
+      if (!targetSocket) return;
+      io.to(targetSocket).emit("answer-call", { fromUserId: userId, answer });
+    });
+
+    socket.on("ice-candidate", ({ toUserId, candidate }) => {
+      const targetSocket = getSocketId(toUserId);
+      if (!targetSocket) return;
+      io.to(targetSocket).emit("ice-candidate", {
+        fromUserId: userId,
+        candidate,
       });
     });
-    socket.on("answer", (data) => {
-      socket.to(getSocketId(data.to)).emit("answer", {
-        answer: data.answer,
-        from: socket.id,
-      });
-    });
-    socket.on("ice-candidate", (data) => {
-      socket.to(getSocketId(data.to)).emit("ice-candidate", {
-        candidate: data.candidate,
-        from: socket.id,
-      });
+
+    // ================= END CALL =================
+    socket.on("end-call", ({ toUserId }) => {
+      const targetSocket = getSocketId(toUserId);
+      if (!targetSocket) return;
+      io.to(targetSocket).emit("call-ended", { fromUserId: userId });
     });
   });
 }

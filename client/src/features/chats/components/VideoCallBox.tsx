@@ -1,86 +1,65 @@
-import { useEffect, useRef } from "react";
-import { useVideoCall } from "../data/VideoCallContext";
+import { Button } from "@/components/ui/button";
+import { useCall } from "../data/CallContext";
 
 export const VideoCallBox = () => {
-  const {
-    callState,
-    localStream,
-    remoteStream,
-    endCall,
-    acceptCall,
-    rejectCall,
-  } = useVideoCall();
-  const localRef = useRef<HTMLVideoElement>(null);
-  const remoteRef = useRef<HTMLVideoElement>(null);
+  const { localStream, peers, acceptCall, endCall, receivingCallFrom } =
+    useCall();
 
-  // Bind local stream
-  useEffect(() => {
-    if (localRef.current && localStream) {
-      localRef.current.srcObject = localStream;
-      localRef.current.play().catch(console.error);
-    }
-  }, [localStream]);
-
-  // Bind remote stream
-  useEffect(() => {
-    if (remoteRef.current && remoteStream) {
-      remoteRef.current.srcObject = remoteStream;
-      remoteRef.current.play().catch(console.error);
-    }
-  }, [remoteStream]);
-
-  if (callState === "idle") return null;
+  const peerIds = Object.keys(peers);
+  if (peerIds.length === 0 && !receivingCallFrom) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-      <div className="relative w-[800px] h-[450px] bg-black rounded-xl overflow-hidden">
-        {/* Remote video */}
-        {callState === "in-call" && (
-          <video
-            ref={remoteRef}
-            className="w-full h-full object-cover"
-            playsInline
-            muted
-          />
-        )}
+    <div className="fixed bottom-5 right-5 flex flex-col gap-3 z-50">
+      {peerIds.map((peerId) => {
+        const peer = peers[peerId];
+        return (
+          <div
+            key={peerId}
+            className="w-96 border bg-muted p-3 flex flex-col gap-3 shadow-lg rounded-lg"
+          >
+            <div className="flex gap-3 relative">
+              <video
+                autoPlay
+                muted
+                playsInline
+                ref={(v) => {
+                  if (v && localStream) {
+                    v.srcObject = localStream;
+                  }
+                }}
+                className="absolute bottom-2 right-2 w-20 aspect-video object-cover border border-gray-700 rounded"
+              />
+              <video
+                autoPlay
+                playsInline
+                ref={(v) => {
+                  if (v) v.srcObject = peer.remoteStream;
+                }}
+                className="w-full aspect-video object-cover border border-gray-700 rounded"
+              />
+            </div>
 
-        {/* Local video */}
-        <video
-          ref={localRef}
-          className="absolute bottom-4 right-4 w-40 h-28 rounded-lg border object-cover"
-          autoPlay
-          playsInline
-          muted
-        />
-
-        {/* Controls */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-          {callState === "incoming" && (
-            <>
-              <button
-                onClick={acceptCall}
-                className="px-4 py-2 bg-green-600 text-white rounded-full"
+            <div className="flex gap-3 items-center justify-center">
+              {!peer.inCall && receivingCallFrom === peerId && (
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={() => acceptCall(peerId)}
+                >
+                  Accept
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => endCall(peerId)}
               >
-                Accept
-              </button>
-              <button
-                onClick={rejectCall}
-                className="px-4 py-2 bg-red-600 text-white rounded-full"
-              >
-                Reject
-              </button>
-            </>
-          )}
-          {(callState === "in-call" || callState === "calling") && (
-            <button
-              onClick={endCall}
-              className="px-4 py-2 bg-red-600 text-white rounded-full"
-            >
-              End Call
-            </button>
-          )}
-        </div>
-      </div>
+                End Call
+              </Button>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
