@@ -15,7 +15,7 @@ export const VideoCallBox = () => {
         return (
           <div
             key={peerId}
-            className="w-96 border bg-muted p-3 flex flex-col gap-3 shadow-lg rounded-lg"
+            className="w-xs border bg-muted p-3 flex flex-col gap-3 shadow-lg rounded-lg"
           >
             <div className="flex gap-3 relative">
               <video
