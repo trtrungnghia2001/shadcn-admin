@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { socket } from "@/lib/socket";
 
-export interface Peer {
+interface Peer {
   pc: RTCPeerConnection;
-  remoteStreamRef: React.MutableRefObject<MediaStream | null>;
+  remoteStream: MediaStream;
   inCall: boolean;
 }
 
@@ -31,70 +31,64 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
     null
   );
 
-  const pcsRef = useRef<Record<string, RTCPeerConnection>>({});
+  const localPcRef = useRef<Record<string, RTCPeerConnection>>({});
 
-  // ------------------------
-  // Local stream
-  // ------------------------
+  // Hàm lấy local stream khi cần
   const getLocalStream = async () => {
-    if (localStream) return localStream;
-
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-
-    setLocalStream(stream);
-    return stream;
+    if (!localStream) {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      setLocalStream(stream);
+      return stream;
+    }
+    return localStream;
   };
 
-  const cleanupLocalStream = () => {
-    if (!localStream) return;
-    localStream.getTracks().forEach((t) => t.stop());
-    setLocalStream(null);
+  // Dọn dẹp camera/micro
+  const cleanUpLocalStream = () => {
+    if (localStream) {
+      localStream.getTracks().forEach((track) => track.stop());
+      setLocalStream(null);
+    }
   };
 
-  // ------------------------
-  // Create PeerConnection
-  // ------------------------
-  const createPeerConnection = (peerId: string) => {
+  // Tạo PeerConnection
+  const createPeerConnection = (peerId: string, stream: MediaStream) => {
     const pc = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
-
-    const remoteStreamRef = { current: new MediaStream() };
+    const remoteStream = new MediaStream();
 
     pc.ontrack = (event) => {
-      event.streams[0].getTracks().forEach((track) => {
-        const stream = remoteStreamRef.current!;
-        if (!stream.getTracks().includes(track)) {
-          stream.addTrack(track);
-        }
-      });
+      event.streams[0].getTracks().forEach((t) => remoteStream.addTrack(t));
+      setPeers((prev) => ({
+        ...prev,
+        [peerId]: { pc, remoteStream, inCall: true },
+      }));
     };
 
     pc.onicecandidate = (event) => {
       if (event.candidate) {
         socket.emit("ice-candidate", {
           toUserId: peerId,
-          candidate: event.candidate,
+          candidate: event.candidate.toJSON(),
         });
       }
     };
 
-    pcsRef.current[peerId] = pc;
+    // Thêm track local
+    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
-    return { pc, remoteStreamRef };
+    localPcRef.current[peerId] = pc;
+    return { pc, remoteStream };
   };
 
-  // ------------------------
-  // Start Call (Caller)
-  // ------------------------
+  // Start call
   const startCall = async (peerId: string) => {
     const stream = await getLocalStream();
-    const { pc, remoteStreamRef } = createPeerConnection(peerId);
-
-    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+    const { pc, remoteStream } = createPeerConnection(peerId, stream);
 
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
@@ -103,18 +97,17 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
 
     setPeers((prev) => ({
       ...prev,
-      [peerId]: { pc, remoteStreamRef, inCall: false },
+      [peerId]: { pc, remoteStream, inCall: false },
     }));
   };
 
-  // ------------------------
-  // Accept Call (Callee)
-  // ------------------------
+  // Accept call
   const acceptCall = async (peerId: string) => {
     const stream = await getLocalStream();
-    const pc = pcsRef.current[peerId];
+    const pc = localPcRef.current[peerId];
     if (!pc) return;
 
+    // Add track local lần này
     stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
     const answer = await pc.createAnswer();
@@ -126,17 +119,14 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
       ...prev,
       [peerId]: { ...prev[peerId], inCall: true },
     }));
-
     setReceivingCallFrom(null);
   };
 
-  // ------------------------
-  // End Call
-  // ------------------------
+  // End call
   const endCall = (peerId: string) => {
-    const pc = pcsRef.current[peerId];
+    const pc = localPcRef.current[peerId];
     if (pc) pc.close();
-    delete pcsRef.current[peerId];
+    delete localPcRef.current[peerId];
 
     setPeers((prev) => {
       const next = { ...prev };
@@ -144,36 +134,56 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
       return next;
     });
 
-    socket.emit("end-call", { toUserId: peerId });
+    setReceivingCallFrom(null);
 
-    if (Object.keys(pcsRef.current).length === 0) {
-      cleanupLocalStream();
+    // Nếu không còn peer → dọn camera
+    if (Object.keys(localPcRef.current).length === 0) {
+      cleanUpLocalStream();
     }
 
-    setReceivingCallFrom(null);
+    socket.emit("end-call", { toUserId: peerId });
   };
 
-  // ------------------------
   // Socket listeners
-  // ------------------------
   useEffect(() => {
     socket.on("call-user", async ({ fromUserId, offer }) => {
-      const { pc, remoteStreamRef } = createPeerConnection(fromUserId);
+      // Tạo pc nhưng không add track local
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      });
+      const remoteStream = new MediaStream();
 
-      await pc.setRemoteDescription(offer);
+      pc.ontrack = (event) => {
+        event.streams[0].getTracks().forEach((t) => remoteStream.addTrack(t));
+        setPeers((prev) => ({
+          ...prev,
+          [fromUserId]: { pc, remoteStream, inCall: true },
+        }));
+      };
 
-      setPeers((prev) => ({
-        ...prev,
-        [fromUserId]: { pc, remoteStreamRef, inCall: false },
-      }));
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit("ice-candidate", {
+            toUserId: fromUserId,
+            candidate: event.candidate.toJSON(),
+          });
+        }
+      };
+
+      await pc.setRemoteDescription(new RTCSessionDescription(offer));
+
+      localPcRef.current[fromUserId] = pc;
 
       setReceivingCallFrom(fromUserId);
+      setPeers((prev) => ({
+        ...prev,
+        [fromUserId]: { pc, remoteStream, inCall: false },
+      }));
     });
 
     socket.on("answer-call", async ({ fromUserId, answer }) => {
-      const pc = pcsRef.current[fromUserId];
-      if (!pc) return;
-      await pc.setRemoteDescription(answer);
+      const pc = localPcRef.current[fromUserId];
+      if (pc) await pc.setRemoteDescription(new RTCSessionDescription(answer));
 
       setPeers((prev) => ({
         ...prev,
@@ -182,16 +192,14 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     socket.on("ice-candidate", async ({ fromUserId, candidate }) => {
-      const pc = pcsRef.current[fromUserId];
-      if (pc && candidate) {
-        await pc.addIceCandidate(candidate);
-      }
+      const pc = localPcRef.current[fromUserId];
+      if (pc) await pc.addIceCandidate(new RTCIceCandidate(candidate));
     });
 
     socket.on("call-ended", ({ fromUserId }) => {
-      const pc = pcsRef.current[fromUserId];
+      const pc = localPcRef.current[fromUserId];
       if (pc) pc.close();
-      delete pcsRef.current[fromUserId];
+      delete localPcRef.current[fromUserId];
 
       setPeers((prev) => {
         const next = { ...prev };
@@ -199,11 +207,11 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
         return next;
       });
 
-      if (Object.keys(pcsRef.current).length === 0) {
-        cleanupLocalStream();
-      }
-
       setReceivingCallFrom(null);
+
+      if (Object.keys(localPcRef.current).length === 0) {
+        cleanUpLocalStream();
+      }
     });
 
     return () => {
