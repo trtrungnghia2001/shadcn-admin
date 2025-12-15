@@ -62,10 +62,16 @@ The dashboard also showcases responsive design, dark/light theme, and integratio
 
 ## Images
 
+Dashboard
 <img width="1920" height="1091" alt="1" src="https://github.com/user-attachments/assets/6762b78b-bee8-4442-8c15-97f9daa4f76f" />
+Users List
 <img width="1920" height="1011" alt="2" src="https://github.com/user-attachments/assets/fb449602-42e9-478a-9913-a95eb6b8a429" />
+Video call
 <img width="1920" height="1436" alt="screencapture-shadcn-admin-4q2f-onrender-2025-12-15-11_41_04" src="https://github.com/user-attachments/assets/af0f578e-3e61-4674-a4d1-44ecbcffe300" />
 <img width="1920" height="1436" alt="screencapture-shadcn-admin-4q2f-onrender-2025-12-15-11_41_04" src="https://github.com/user-attachments/assets/6469e49b-204c-425e-a0b7-e4f58d283cff" />
+Chat
 <img width="1920" height="863" alt="3" src="https://github.com/user-attachments/assets/fbba1e33-eb5f-432f-9c40-7f54509ea8ee" />
+Account
 <img width="1920" height="1183" alt="4" src="https://github.com/user-attachments/assets/b65c7093-0f87-449a-91ee-84fe5c99ec39" />
+Kanban Drag and drop
 <img width="2230" height="868" alt="5" src="https://github.com/user-attachments/assets/c5ba8ba8-7bf9-4e93-83b4-b4f811e695c4" />
