@@ -102,13 +102,28 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Accept call
+  // const acceptCall = async (peerId: string) => {
+  //   const stream = await getLocalStream();
+  //   const pc = localPcRef.current[peerId];
+  //   if (!pc) return;
+
+  //   // Add track local lần này
+  //   stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+
+  //   const answer = await pc.createAnswer();
+  //   await pc.setLocalDescription(answer);
+
+  //   socket.emit("answer-call", { toUserId: peerId, answer });
+
+  //   setPeers((prev) => ({
+  //     ...prev,
+  //     [peerId]: { ...prev[peerId], inCall: true },
+  //   }));
+  //   setReceivingCallFrom(null);
+  // };
   const acceptCall = async (peerId: string) => {
-    const stream = await getLocalStream();
     const pc = localPcRef.current[peerId];
     if (!pc) return;
-
-    // Add track local lần này
-    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
     const answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);
@@ -119,6 +134,7 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
       ...prev,
       [peerId]: { ...prev[peerId], inCall: true },
     }));
+
     setReceivingCallFrom(null);
   };
 
@@ -146,11 +162,47 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Socket listeners
   useEffect(() => {
+    // socket.on("call-user", async ({ fromUserId, offer }) => {
+    //   // Tạo pc nhưng không add track local
+    //   const pc = new RTCPeerConnection({
+    //     iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    //   });
+    //   const remoteStream = new MediaStream();
+
+    //   pc.ontrack = (event) => {
+    //     event.streams[0].getTracks().forEach((t) => remoteStream.addTrack(t));
+    //     setPeers((prev) => ({
+    //       ...prev,
+    //       [fromUserId]: { pc, remoteStream, inCall: true },
+    //     }));
+    //   };
+
+    //   pc.onicecandidate = (event) => {
+    //     if (event.candidate) {
+    //       socket.emit("ice-candidate", {
+    //         toUserId: fromUserId,
+    //         candidate: event.candidate.toJSON(),
+    //       });
+    //     }
+    //   };
+
+    //   await pc.setRemoteDescription(new RTCSessionDescription(offer));
+
+    //   localPcRef.current[fromUserId] = pc;
+
+    //   setReceivingCallFrom(fromUserId);
+    //   setPeers((prev) => ({
+    //     ...prev,
+    //     [fromUserId]: { pc, remoteStream, inCall: false },
+    //   }));
+    // });
     socket.on("call-user", async ({ fromUserId, offer }) => {
-      // Tạo pc nhưng không add track local
+      const stream = await getLocalStream(); // ✅ LẤY STREAM NGAY
+
       const pc = new RTCPeerConnection({
         iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
       });
+
       const remoteStream = new MediaStream();
 
       pc.ontrack = (event) => {
@@ -169,6 +221,9 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
           });
         }
       };
+
+      // ✅ ADD TRACK TRƯỚC
+      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
 
