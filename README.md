@@ -64,7 +64,9 @@ The dashboard also showcases responsive design, dark/light theme, and integratio
 
 <img width="1920" height="1091" alt="1" src="https://github.com/user-attachments/assets/6762b78b-bee8-4442-8c15-97f9daa4f76f" />
 <img width="1920" height="1011" alt="2" src="https://github.com/user-attachments/assets/fb449602-42e9-478a-9913-a95eb6b8a429" />
-<img width="1920" height="1436" alt="screencapture-shadcn-admin-4q2f-onrender-2025-12-15-11_41_04" src="https://github.com/user-attachments/assets/af0f578e-3e61-4674-a4d1-44ecbcffe300" />![0c061330-994b-438e-bf6c-fdce6f7683df](https://github.com/user-attachments/assets/ce2cd351-8ffe-4456-8cfe-3701bd00190d)
+<img width="1920" height="1436" alt="screencapture-shadcn-admin-4q2f-onrender-2025-12-15-11_41_04" src="https://github.com/user-attachments/assets/af0f578e-3e61-4674-a4d1-44ecbcffe300" />
+<img width="1920" height="1436" alt="screencapture-shadcn-admin-4q2f-onrender-2025-12-15-11_41_04" src="https://github.com/user-attachments/assets/8b93e27e-6dbd-4d5e-8c2c-aa3256207eaf" />
+![0c061330-994b-438e-bf6c-fdce6f7683df](https://github.com/user-attachments/assets/c404896d-6c1e-486f-b38b-80e224975596)
 
 <img width="1920" height="863" alt="3" src="https://github.com/user-attachments/assets/fbba1e33-eb5f-432f-9c40-7f54509ea8ee" />
 <img width="1920" height="1183" alt="4" src="https://github.com/user-attachments/assets/b65c7093-0f87-449a-91ee-84fe5c99ec39" />
