@@ -115,10 +115,10 @@ const SignupForm = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-2">
-          <Button variant="outline" type="button">
+          <Button variant="outline" type="button" disabled>
             <FaGoogle size={16} /> Google
           </Button>{" "}
-          <Button variant="outline" type="button">
+          <Button variant="outline" type="button" disabled>
             <FaGithub size={16} /> GitHub
           </Button>
         </div>

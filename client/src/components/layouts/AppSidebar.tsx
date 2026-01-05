@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 
 import clsx from "clsx";
-import { ChevronRight, VenusAndMars } from "lucide-react";
+import { ChevronRight, LogInIcon, VenusAndMars } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -71,18 +71,22 @@ export function AppSidebar() {
         ))}
       </SidebarContent>
       <SidebarFooter className="bg-background">
-        <div className="flex items-center gap-2 px-2">
-          <Avatar>
-            <AvatarImage src={auth?.avatar || ""} alt="@shadcn" />
-            <AvatarFallback>
-              {auth?.name.split(" ").map((item) => item[0])}
-            </AvatarFallback>
-          </Avatar>
-          <div className="text-xs">
-            <p className="font-medium">{auth?.name}</p>
-            <p className="text-muted-foreground font-normal">{auth?.email}</p>
+        {auth ? (
+          <div className="flex items-center gap-2 px-2">
+            <Avatar>
+              <AvatarImage src={auth?.avatar || ""} alt="@shadcn" />
+              <AvatarFallback>
+                {auth?.name.split(" ").map((item) => item[0])}
+              </AvatarFallback>
+            </Avatar>
+            <div className="text-xs">
+              <p className="font-medium">{auth?.name}</p>
+              <p className="text-muted-foreground font-normal">{auth?.email}</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <AppSidebarItem label="Signin" icon={LogInIcon} path="/signin" />
+        )}
       </SidebarFooter>
     </Sidebar>
   );
