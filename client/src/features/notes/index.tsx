@@ -5,7 +5,7 @@ import {
   DndContext,
   DragOverlay,
   type DragEndEvent,
-  type DragOverEvent,
+  type DragMoveEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
 import SortableItem from "./components/SortableItem";
@@ -40,7 +40,7 @@ const NotesPage = () => {
       type: e.active.data.current?.type,
     });
   };
-  const onDragOver = (e: DragOverEvent) => {
+  const onDragMove = (e: DragMoveEvent) => {
     const { active, over } = e;
     if (!active || !over || active.id === over.id) return;
 
@@ -82,8 +82,8 @@ const NotesPage = () => {
       if (activeTask.columnId !== overTask.columnId) {
         setTasksDraft(
           tasksDraft.map((t) =>
-            t.id === active.id ? { ...t, columnId: overTask.columnId } : t
-          )
+            t.id === active.id ? { ...t, columnId: overTask.columnId } : t,
+          ),
         );
         return;
       }
@@ -102,8 +102,8 @@ const NotesPage = () => {
           tasksDraft.map((t) =>
             t.id === active.id.toString()
               ? { ...t, columnId: over.id.toString() }
-              : t
-          )
+              : t,
+          ),
         );
       }
       return;
@@ -134,7 +134,7 @@ const NotesPage = () => {
         <DndContext
           collisionDetection={closestCorners}
           onDragStart={onDragStart}
-          onDragOver={onDragOver}
+          onDragMove={onDragMove}
           onDragEnd={onDragEnd}
         >
           <SortableContext items={columnsDraft.map((c) => c.id)}>
@@ -144,7 +144,7 @@ const NotesPage = () => {
                   <NoteColumn
                     column={column}
                     tasks={tasksDraft.filter(
-                      (task) => task.columnId === column.id
+                      (task) => task.columnId === column.id,
                     )}
                   />
                 </SortableItem>

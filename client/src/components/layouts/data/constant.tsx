@@ -85,7 +85,7 @@ export const sidebarLinks: SidebarGroup[] = [
           {
             icon: Bug,
             path: "/errors/internal-server",
-            label: "Internal Server Erro",
+            label: "Internal Server Error",
           },
           {
             icon: Construction,

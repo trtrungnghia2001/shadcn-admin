@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import clsx from "clsx";
 import { Button } from "../ui/button";
 import { Settings } from "lucide-react";
@@ -41,11 +41,6 @@ const Header = () => {
         <Button size="icon" variant="ghost" className="rounded-full">
           <Settings />
         </Button>
-        {!auth && (
-          <Button variant={"outline"} size={"sm"} asChild>
-            <Link to={`/signin`}>Sigin</Link>
-          </Button>
-        )}
         {auth && (
           <DropdownMenu>
             <DropdownMenuTrigger>

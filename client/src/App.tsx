@@ -3,6 +3,7 @@ import { Toaster } from "./components/ui/sonner";
 import RouterTree from "./routers";
 import { useEffect } from "react";
 import { VideoCallBox } from "./features/chats/components/VideoCallBox";
+import StartNotificationDialog from "./components/customs/start-notification-dialog";
 
 const App = () => {
   const location = useLocation();
@@ -14,6 +15,7 @@ const App = () => {
       <RouterTree />
       <Toaster />
       <VideoCallBox />
+      <StartNotificationDialog />
     </div>
   );
 };

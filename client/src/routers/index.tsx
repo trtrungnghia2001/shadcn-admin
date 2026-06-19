@@ -21,7 +21,11 @@ const RouterTree = () => {
   const routers = useRoutes([
     {
       path: `/`,
-      element: <Layout />,
+      element: (
+        <AuthProtected>
+          <Layout />
+        </AuthProtected>
+      ),
       children: [
         {
           index: true,
@@ -49,11 +53,7 @@ const RouterTree = () => {
         },
         {
           path: "users",
-          element: (
-            <AuthProtected>
-              <UsersPage />
-            </AuthProtected>
-          ),
+          element: <UsersPage />,
         },
         {
           path: "auth/*",
@@ -65,11 +65,7 @@ const RouterTree = () => {
         },
         {
           path: "chats/*",
-          element: (
-            <AuthProtected>
-              <ChatPage />
-            </AuthProtected>
-          ),
+          element: <ChatPage />,
         },
         {
           path: "settings/*",

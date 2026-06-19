@@ -59,7 +59,7 @@ export const useAuthStore = create<AuthStoreType>()(
           const resp = (
             await axiosInstance.post<ApiResponse<AuthType>>(
               `auth/me/update`,
-              data
+              data,
             )
           ).data;
 
@@ -73,7 +73,7 @@ export const useAuthStore = create<AuthStoreType>()(
       {
         name: "auth",
         storage: createJSONStorage(() => localStorage),
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

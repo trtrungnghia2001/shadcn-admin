@@ -19,16 +19,19 @@ import { useMutation } from "@tanstack/react-query";
 import { formSigninSchema, type SigninDTO } from "../data/schema";
 import { toast } from "sonner";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useNotificationStore } from "@/components/customs/start-notification-dialog/store";
 
 const SigninForm = () => {
   const location = useLocation();
-
   const navigate = useNavigate();
+
+  const { onChange } = useNotificationStore();
   const { signin } = useAuthStore();
   const { isPending, mutate } = useMutation({
     mutationFn: async (data: SigninDTO) => await signin(data),
     onSuccess: (data) => {
       toast.success(data.message);
+      onChange(true);
 
       const redirectUrl = location.state
         ? location.state.pathname + location.state.search

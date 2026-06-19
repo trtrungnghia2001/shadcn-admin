@@ -7,4 +7,5 @@ export const ENV = {
   JWT_SECRET: process.env.JWT_SECRET,
   MONGO_URI: process.env.MONGO_URI,
   MONGO_DB: process.env.MONGO_DB,
+  REDIS_URL: process.env.REDIS_URL,
 };
