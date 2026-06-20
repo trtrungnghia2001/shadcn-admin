@@ -21,12 +21,15 @@ jobs:
       - name: 🚚 Bước 1 - Kéo code từ GitHub về máy ảo
         uses: actions/checkout@v4
 
-      # Bước 2: Cài đặt môi trường Node.js phiên bản 20 lên con máy ảo đó
-      - name: 🟢 Bước 2 - Cài đặt môi trường Node.js bản 20
+      # Bước 2: Setup môi trường Node.js phiên bản mới nhất năm 2026 (Node 26)
+      - name: 🟢 Bước 2 - Cài đặt môi trường Node.js bản 26
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: "npm" # Bật tính năng nhớ (cache) các thư viện, lần sau push code nó cài vèo phát xong ngay
+          node-version: 26
+          cache: "npm"
+          cache-dependency-path: |
+            server/package-lock.json
+            client/package-lock.json
 
       # 🛑 --- BẮT ĐẦU KIỂM TRA PHẦN BACKEND (SERVER NODE.JS) ---
 
