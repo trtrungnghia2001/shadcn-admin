@@ -48,7 +48,10 @@ The dashboard also showcases responsive design, dark/light theme, and integratio
 * Switchable themes with Shadcn UI
 * Consistent styling for tables, forms, and sidebar
 
-📊 Dashboard & Charts
+Common
+* Dashboard & Charts
+* Docker
+* CICD
 
 ## Technologies Used
 
@@ -58,7 +61,7 @@ The dashboard also showcases responsive design, dark/light theme, and integratio
 
 ## Demo
 
-[https://shadcn-admin-4q2f.onrender.com/](https://shadcn-admin-4q2f.onrender.com/)
+[https://shadcn-admin-opal.vercel.app](https://shadcn-admin-opal.vercel.app)
 
 ## Images
 
