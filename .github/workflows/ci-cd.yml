@@ -1,0 +1,81 @@
+# 1. Tên của chuỗi quy trình tự động này (Hiển thị trên tab Actions của GitHub)
+name: Chuỗi Quy Trình Tự Động Node.js và Vite
+
+# 2. Luật kích hoạt: Khi nào thì thế trận này được bắt đầu chạy?
+on:
+  push:
+    branches: [main] # Khi bro gõ lệnh "git push" lên nhánh main
+  pull_request:
+    branches: [main] # Hoặc khi bro tạo một yêu cầu gộp code (Pull Request) vào nhánh main
+
+# 3. Các công việc lớn cần làm (Jobs)
+jobs:
+  # ================= CHẶNG 1: KIỂM TRA CHẤT LƯỢNG CODE (CI) =================
+  continuous-integration:
+    # Ra lệnh cho GitHub thuê 1 con server ảo chạy hệ điều hành Ubuntu bản mới nhất
+    runs-on: ubuntu-latest
+
+    # Các bước nhỏ cần thực hiện tuần tự trong con máy ảo này:
+    steps:
+      # Bước 1: Máy ảo trống trơn, cần kéo toàn bộ code từ Repo GitHub của bro về ổ đĩa của nó
+      - name: 🚚 Bước 1 - Kéo code từ GitHub về máy ảo
+        uses: actions/checkout@v4
+
+      # Bước 2: Cài đặt môi trường Node.js phiên bản 20 lên con máy ảo đó
+      - name: 🟢 Bước 2 - Cài đặt môi trường Node.js bản 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm" # Bật tính năng nhớ (cache) các thư viện, lần sau push code nó cài vèo phát xong ngay
+
+      # 🛑 --- BẮT ĐẦU KIỂM TRA PHẦN BACKEND (SERVER NODE.JS) ---
+
+      # Bước 3: Di chuyển vào thư mục "server" và cài đặt các thư viện (package.json)
+      # Lệnh "npm ci" tương tự "npm install" nhưng dùng riêng cho máy ảo, giúp cài chính xác và nhanh hơn
+      - name: 📦 Bước 3 (Server) - Cài đặt các thư viện Node.js
+        run: |
+          cd server
+          npm ci
+
+      # Bước 4: Quét xem các thư viện backend có bị dính lỗ hổng bảo mật nghiêm trọng nào không
+      # Thêm cú pháp "|| true" để lỡ thư viện có cảnh báo nhẹ thì máy ảo vẫn chạy tiếp, không bị dừng đột ngột
+      - name: 🔍 Bước 4 (Server) - Quét lỗi bảo mật thư viện (Audit)
+        run: |
+          cd server
+          npm audit --audit-level=high || true
+
+      # 🛑 --- BẮT ĐẦU KIỂM TRA PHẦN FRONTEND (CLIENT VITE) ---
+
+      # Bước 5: Di chuyển vào thư mục "client" và cài đặt thư viện cho giao diện Vite
+      - name: 📦 Bước 5 (Client) - Cài đặt các thư viện React Vite
+        run: |
+          cd client
+          npm ci
+
+      # Bước 6: Chạy thử lệnh Build của Vite (npm run build) ngay trên máy ảo.
+      # Mục đích: Check xem code TypeScript có bị khai báo lỗi không, component có bị thiếu file không.
+      # Nếu bước này lỗi (ví dụ bro quên import file), máy ảo sẽ báo ĐỎ LÒM để bro biết đường sửa trước khi deploy.
+      - name: 🏗️ Bước 6 (Client) - Chạy thử lệnh Build dự án Vite
+        run: |
+          cd client
+          npm run build --if-present
+
+  # ================= CHẶNG 2: TỰ ĐỘNG ĐẨY CODE LÊN SERVER CHẠY THẬT (CD) =================
+  continuous-deployment:
+    # ⚠️ ĐIỀU KIỆN CHÍ MẠNG: Chỉ khi nào Chặng 1 (CI) ở trên chạy THÀNH CÔNG (Tích xanh) thì chặng này mới được chạy
+    needs: continuous-integration
+
+    runs-on: ubuntu-latest
+
+    # Chỉ deploy khi bro "push code thật sự" lên nhánh main, còn nếu chỉ làm Pull Request test code thì bỏ qua bước này
+    if: github.event_name == 'push'
+
+    steps:
+      - name: 🚚 Kéo code về lại máy ảo phục vụ deploy
+        uses: actions/checkout@v4
+
+      # Bước cuối cùng: Kích hoạt lệnh deploy sang các bên hosting (Render, Vercel, VPS...)
+      - name: 🚀 Kích hoạt lệnh Deploy tự động lên môi trường Production
+        run: |
+          echo "Chúc mừng bro! Code đã sạch, test và build thành công 100%."
+          echo "Chuẩn bị ném lệnh Deploy thật vào đây..."

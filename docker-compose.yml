@@ -1,0 +1,27 @@
+services:
+  client:
+    build: ./client
+    container_name: client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules       
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_URL_SERVER= http://localhost:5000
+      - VITE_URL_SOCKET= http://localhost:5000
+    command: npm run dev -- --host 0.0.0.0 # Ép Vite mở host ra ngoài container để máy thật truy cập
+    depends_on:
+      - server
+  server:
+    build: ./server
+    container_name: server
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules     
+    environment:
+      - NODE_ENV=development  
+    command: npm run dev -- -L # Cú pháp nodemon hot-reload qua volume chuẩn cho Windows

@@ -1,3 +1,4 @@
+// SortableItem.tsx
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
@@ -10,11 +11,16 @@ interface SortableItemProps {
 }
 
 function SortableItem({ id, type, children }: SortableItemProps) {
+  // Gắn chặt data vào hook useSortable để dnd-kit truy xuất tức thì
   const { attributes, listeners, setNodeRef, transform, transition, isOver } =
-    useSortable({ id: id, data: { id, type } });
+    useSortable({
+      id: id,
+      data: { id, type },
+    });
 
   const style = {
-    transform: CSS.Translate.toString(transform),
+    // Lưu ý: Đối với cấu trúc lồng nhau phức tạp, dùng CSS.Transform sẽ chuẩn hơn CSS.Translate
+    transform: CSS.Transform.toString(transform),
     transition,
   };
 
@@ -25,7 +31,7 @@ function SortableItem({ id, type, children }: SortableItemProps) {
       {...attributes}
       {...listeners}
       className={clsx([
-        "cursor-grab",
+        "cursor-grab list-none",
         isOver && "opacity-50",
         type === "column" && `min-h-[400px]`,
       ])}
