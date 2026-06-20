@@ -14,7 +14,7 @@ import ConfirmDialog from "@/components/customs/confirm-dialog";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { queryClient } from "@/main";
 import ButtonExport from "@/components/customs/button-export";
 
@@ -110,7 +110,12 @@ const UsersPage = () => {
     setSearchParams(params);
   };
 
+  const isMount = useRef(false);
+
   useEffect(() => {
+    if (!isMount.current) return;
+
+    isMount.current = true;
     handleFilter();
   }, [columnFilters]);
 
@@ -191,7 +196,7 @@ const UsersPage = () => {
               table
                 .getFilteredSelectedRowModel()
                 .rows.map((r) => r.original)
-                .map((item) => item._id)
+                .map((item) => item._id),
             );
 
             // set lai page
